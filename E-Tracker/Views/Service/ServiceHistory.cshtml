@@ -1,0 +1,62 @@
+﻿@model IEnumerable<ServiceDto>
+@inject E_Tracker.Repository.DepartmentRepo.IDepartmentRepository DepartmentRepository
+@{
+    ViewData["Title"] = "Service History";
+}
+
+<h1>Service/Renewal History</h1>
+<table id="myTable" class="table table-striped table-primary">
+    <thead>
+        <tr>
+            <th>
+                Service Department
+            </th>
+            <th>
+                Item Name
+            </th>
+            <th>
+                Date Serviced
+            </th>
+            <th>
+                Date of Expiration
+            </th>
+            <th>
+                Item Department
+            </th>
+            <th>
+
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var service in Model)
+        {
+            <tr>
+                <td>
+                    @service.ServiceDepartment?.Name
+                </td>
+                <td>
+                    @service.Item?.Name
+                </td>
+                <td>
+                    @service.Item?.ItemGroup?.Name
+                </td>
+                <td>
+                    @service.DateServiced.ToShortDateString()
+                </td>
+                <td>
+                    @service.NewExpiryDate.ToShortDateString()
+                </td>
+                 <td>@{var department = await DepartmentRepository.GetDepartmentByIdAsync(service.Item?.ItemGroup?.DepartmentId); }
+                @department?.Name
+                </td>
+
+                <td>
+
+                    <a asp-action="Details" asp-controller="Service" asp-route-serviceId="@service.Id"><i class="fa fa-eye" data-toggle="tooltip" data-placement="top" title="Details"></i></a>
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

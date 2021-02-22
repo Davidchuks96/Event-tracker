@@ -1,0 +1,115 @@
+﻿@model IEnumerable<CategoryDto>
+
+@{
+    ViewData["Title"] = "Categories";
+    var url = this.Url.ActionContext.HttpContext.Request.Scheme;
+    var url2 = $"{@Url.Action("DeleteCategory", "Category", null, this.Url.ActionContext.HttpContext.Request.Scheme)}";
+    var url3 = $"{@Url.Action("ActivateCategory", "Category", null, this.Url.ActionContext.HttpContext.Request.Scheme)}";
+}
+
+<h1>Categories</h1>
+
+@if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.CreateCategory)) {
+<p>
+    <a asp-action="CreateCategory" asp-controller="Category" class="btn btn-primary">Create New</a>
+</p>
+}
+<table id="myTable" class="table table-striped table-primary">
+    <thead>
+        <tr>
+            <th>
+                S/N
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @{ int i = 1; }
+        @foreach (var category in Model)
+        {
+            <tr>
+                <td>
+                    @i
+                    @{i++;}
+                </td>
+
+                <td>
+                    <a asp-action="AllItemsCreatedByMyDepartmentByCategory" asp-controller="Item" asp-route-categoryId="@category.Id">@category.Name</a>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelCategory => category.Description)
+                </td>
+                <td>
+
+                    @*@Html.ActionLink("Edit", "UpdateDepartment", new { departmentId = department.Id })|*@
+                    @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.UpdateCategory) && category.IsActive == true)
+                    {
+                        <a asp-action="UpdateCategory" asp-controller="Category" asp-route-categoryId="@category.Id"><i class="fa fa-edit" data-toggle="tooltip" data-placement="top" title="Edit"></i></a>
+                    }
+                    @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.DeleteCategory) && category.IsActive == true)
+                    {
+                        @:|<a href="#" onClick="Delete('@category.Id', '@url2' )"><i class="fa fa-trash" data-toggle="tooltip" data-placement="top" title="Delete"></i></a>
+                    }
+                    @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.ActivateCategory) && category.IsActive == false)
+                    {
+
+                        @:|<a href="#" onClick="Restore('@category.Id', '@url3' )"><i class="fa fa-trash-restore" data-toggle="tooltip" data-placement="top" title="Restore"></i></a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table><script>
+    function Delete(id, url) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.value) {
+                //Swal.fire(
+                //    'Deleted!',
+                //    'Your file has been deleted.',
+                //    'success'
+                //)
+
+                window.location.replace(url + "?categoryId=" + id)
+            }
+        })
+    }
+
+    function Restore(id, url) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, Restore it!'
+        }).then((result) => {
+            if (result.value) {
+                //Swal.fire(
+                //    'Deleted!',
+                //    'Your file has been deleted.',
+                //    'success'
+                //)
+
+                window.location.replace(url + "?categoryId=" + id)
+            }
+        })
+    }
+</script>
+
+

@@ -1,0 +1,226 @@
+﻿@model ServiceDto
+@inject E_Tracker.Repository.DepartmentRepo.IDepartmentRepository DepartmentRepository
+@{
+    ViewData["Title"] = "Service Details - " + Model.Id;
+    if (Model.ServiceDepartment == null) { Model.ServiceDepartment = new DepartmentDto { Name = "Empty" }; };
+    if (Model.Item == null) { Model.Item = new ItemDto { Name = "Empty" }; };
+    if (Model.CreatedBy == null) { Model.CreatedBy = new UserDto { UserName = "Empty" }; };
+    if (Model.UpdatedBy == null) { Model.UpdatedBy = new UserDto { UserName = "Empty" }; };
+    if (Model.ServiceApprovedBy == null) { Model.ServiceApprovedBy = new UserDto { UserName = "Empty" }; };
+    var url1 = $"{@Url.Action("ApproveService", "Service", null, this.Url.ActionContext.HttpContext.Request.Scheme)}";
+    //var s = "";
+}
+
+<h1>Details</h1>
+<div class="row">
+
+    <div class="col-lg-12">
+        <div class="card o-hidden border-0 shadow-lg my-5">
+            <div class="card-body p-0">
+                <!-- Nested Row within Card Body -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="p-5">
+                            <div class="text-center">
+                                <h1 class="h4 text-gray-900 mb-4">@Model.Item.Name details</h1>
+                            </div>
+                            <div asp-validation-summary="All" class="text-danger"></div>
+                            <div class="form-group row mb-1">
+                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                    <label asp-for="Item.Name" class="display-6 font-weight-bold">Item Name</label>
+                                    <p>@Model.Item.Name</p>
+
+                                </div>
+                                <div class="col-sm-6">
+                                    <label asp-for="Item.TagNo" class="display-6 font-weight-bold">Tag Number</label>
+                                    <p>@Model.Item.TagNo</p>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-1">
+                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                    <div class="form-group">
+                                        <label asp-for="ServiceDepartment.Name" class="display-6 font-weight-bold">Service Department</label>
+                                        <p>@Model.ServiceDepartment.Name</p>
+                                    </div>
+
+                                </div>
+                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                    <div class="form-group">
+                                        <label asp-for="Item.ItemGroup.Name" class="display-6 font-weight-bold">Item Group</label>
+                                        <p>@Model.Item?.ItemGroup?.Name</p>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="form-group row mb-1">
+                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                    <div class="form-group">
+                                        <label class="display-6 font-weight-bold">Item Group Department</label>
+                                        <p>
+                                            @{var department = await DepartmentRepository.GetDepartmentByIdAsync(Model.Item?.ItemGroup?.DepartmentId); }
+                                            @department?.Name
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                    <div class="form-group">
+                                        <label asp-for="CreatedBy" class="display-6 font-weight-bold">Item Created By</label>
+                                        @{var nameOfItemCreator = Model?.Item?.CreatedBy?.Surname + " " + Model?.Item?.CreatedBy?.OtherNames; }
+                                        <p>@nameOfItemCreator</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-1">
+                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                    <div class="form-group">
+                                        <label asp-for="CreatedBy.UserName" class="display-6 font-weight-bold">Serviced By</label>
+                                        @{var nameOfServiceCreator = Model.CreatedBy.Surname + " " + Model.CreatedBy.OtherNames; }
+                                        <p>@nameOfServiceCreator</p>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label asp-for="DateServiced" class="display-6 font-weight-bold">Date Serviced</label>
+                                        <p>@Model.DateServiced.ToShortDateString() </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-1">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label asp-for="NewExpiryDate" class="display-6 font-weight-bold">Date of Expiry</label>
+                                        <p>@Model.NewExpiryDate.ToShortDateString()</p>
+                                    </div>
+                                </div>
+                            </div>
+                                <table class="table table-striped table-primary mb-3">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                @Html.DisplayNameFor(model => model.IsServiceApproved)
+                                            </th>
+                                            <th>
+                                                Approved By
+                                            </th>
+                                        </tr>
+
+                                    </thead>
+                                    <tbody>
+
+                                        <tr>
+                                            <td>
+                                                @*@Html.DisplayFor(modelItem => item.IsApproved)*@
+
+                                                @{string status = "";}
+                                                @*@Html.DisplayFor(modelItem => item.IsApproved)*@
+                                                @{ if (Model.IsServiceApproved == true) status = "APPROVED"; else status = "NOT APPROVED"; }
+                                                @status
+                                            </td>
+                                            <td>
+                                                @{ string name = "N/A";}
+                                                @{if (Model.IsServiceApproved == true)
+                                                    {
+                                                        name = Model.ServiceApprovedBy.Surname + " " + Model.ServiceApprovedBy.OtherNames;
+                                                        @name;
+                                                    }
+                                                    else
+                                                        @name
+                                                }
+                                            </td>
+
+                                        </tr>
+
+                                    </tbody>
+
+                                </table>
+                                <div class="form-group row">
+                                    <div class="col-sm-6 mb-3 mb-sm-0">
+                                        <div class="form-group">
+                                            <label asp-for="Comments" class="display-6 font-weight-bold">Comments</label>
+                                            <p>@Model.Comments</p>
+                                        </div>
+                                        <div class="col-sm-6 mb-3 mb-sm-0">
+                                        </div>
+
+                                     </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <a asp-action="Services" asp-controller="Service" class="btn btn-primary mt-2">Go back</a>
+                                    <hr>
+
+                                    @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.ApproveService) && Model.IsServiceApproved == false)
+                                    {
+                                        <input type="button" class="btn btn-primary mt-2" onClick="Approve('@Model.Id', '@url1' )" value="Approve" />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@* @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.ApproveService) && Model.IsServiceApproved == false
+   && Model.Status == "Pending" && Model.IsActive == true)
+{
+    <form method="post" action="ApproveService">
+
+        <div class="card mb-4">
+            <!-- Card header -->
+            <div class="card-header">
+                <h3 class="mb-0">Your Comments</h3>
+            </div>
+            <!-- Card body -->
+            <div class="card-body">
+                <!-- Form groups used in grid -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <label asp-for="ApproveOrRejectComments" class="col-md-2 col-form-label form-control-label">Comments</label>
+                        <div class="col-md-10">
+                            <textarea asp-for="ApproveOrRejectComments" class="form-control" required></textarea>
+                            <span asp-validation-for="ApproveOrRejectComments" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" asp-for="Id" />
+        <div class="text-center">
+            @*<label class="custom-toggle">
+                    <input type="checkbox" asp-for="IsApproved" value="true" checked />
+                    <span id="toggleApprove" class="custom-toggle-slider rounded-circle" data-label-off="Reject" data-label-on="Approve" width="150px"></span>
+                </label> this was commented out
+        </div>
+        <div class="text-center">
+            <button id="btnApprove" type="submit" class="btn btn-primary my-4">Approve</button>
+            <button id="btnReject" class="btn btn-danger" data-toggle="sweet-alert" data-sweet-alert="question" value="false">Reject</button>
+        </div>
+    </form>
+
+}  *@
+<script>
+    function Approve(id, url) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, Approve it!'
+        }).then((result) => {
+            if (result.value) {
+                //Swal.fire(
+                //    'Deleted!',
+                //    'Your file has been deleted.',
+                //    'success'
+                //)
+
+                window.location.replace(url + "?serviceId=" + id)
+            }
+        })
+    }
+</script>
+

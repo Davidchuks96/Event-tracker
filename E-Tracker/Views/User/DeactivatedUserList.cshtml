@@ -1,0 +1,88 @@
+﻿@model IEnumerable<E_Tracker.Dto.UserDto>
+
+@{
+    ViewData["Title"] = "Deactivated User List";
+    var url = this.Url.ActionContext.HttpContext.Request.Scheme;
+    var url2 = $"{@Url.Action("ActivateUser", "User", null, this.Url.ActionContext.HttpContext.Request.Scheme)}";
+    var i = 1;
+}
+
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">List  of Deactivated Users</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="myTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>S/N</th>
+                        <th>Surname</th>
+                        <th>OtherName</th>
+                        <th>Email</th>
+                        <th>Department</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model)
+                    {
+                        var name = user.Surname + " " + user.OtherNames;
+                        <tr>
+                            <td>
+                                @i
+                                @{i++;}
+                            </td>
+                            <td>@user.Surname</td>
+                            <td>@user.OtherNames</td>
+                            <td>@user.Email</td>
+                            <td>
+                                @if (user.Department?.Name?.Any() == true)
+                                {
+                                    @user.Department.Name
+                                }
+                                else
+                                {
+                                    <p>No department</p>
+                                }
+                            </td>
+                            <td>
+                                @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.ActivateUser))
+                                {
+                                    <a href="#" onClick="Restore('@user.Id', '@url2', '@name' )"><i class="fa fa-trash-restore" data-toggle="tooltip" data-placement="top" title="Restore"></i></a>
+                                    @:|
+                                    <a asp-action="UserDetails" asp-controller="User" asp-route-userId="@user.Id"><i class="fa fa-eye" data-toggle="tooltip" data-placement="top" title="User Details"></i></a>
+                                }
+                                @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.ViewRole))
+                                {
+                                    @:|
+                                    <a asp-controller="User" asp-action="UserRoles" asp-route-userId="@user.Id" class="btn btn-primary"><i class="fa fa-users" data-toggle="tooltip" data-placement="top" title="Roles"></i></a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    function Restore(id, url, name) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You are about to restore " + name + " !",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, restore user!'
+        }).then((result) => {
+            if (result.value) {
+
+                window.location.replace(url + "?userId=" + id)
+            }
+        })
+    }
+</script>

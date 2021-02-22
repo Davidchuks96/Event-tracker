@@ -1,0 +1,242 @@
+﻿@model IEnumerable<E_Tracker.Dto.ItemDto>
+@{
+    ViewData["Title"] = "AllItems";
+    var url1 = $"{@Url.Action("ApproveItem", "Item", null, this.Url.ActionContext.HttpContext.Request.Scheme)}";
+    var url2 = $"{@Url.Action("DeleteItem", "Item", null, this.Url.ActionContext.HttpContext.Request.Scheme)}";
+    var url3 = $"{@Url.Action("ActivateItem", "Item", null, this.Url.ActionContext.HttpContext.Request.Scheme)}";
+    var category = TempData["CategoryName"];
+
+
+}
+@if (ViewBag.ItemGroup != null)
+{
+
+    <h1>Items for @ViewBag.ItemGroup?.Name @{if (category != null) { category = "in " + category + " Category"; }; } @category</h1>
+}
+else
+{
+    <h1>Items @{if (category != null) { category = "in " + category + " Category"; }; } @category</h1>
+}
+@if (ViewBag.ItemGroup != null && User.HasClaim(CustomClaims.Permission, CustomClaimsValues.CreateItem) && ViewBag.IsAllItems ?? true)
+{
+    <p>
+        @*id="createItem" data-target="#myModal" class="trigger-btn" data-toggle="modal"*@
+        <a asp-action="CreateItem" asp-controller="Item" asp-route-itemGroupId="@ViewBag.ItemGroup?.Id" class="btn btn-primary">Create New Item</a>
+    </p>
+
+}
+<table id="myTable" class="table table-striped table-primary">
+    <thead>
+        <tr>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            @*<th>
+                Item Type
+            </th>*@
+            <th>
+                Item Group
+            </th>
+            @*<th>
+                Department
+            </th>*@
+            <th>
+                Date of Expiry
+                @*@Html.DisplayNameFor(model => model.ExpiredDate)*@
+            </th>
+            <th>
+                Approval Status
+                @*@Html.DisplayNameFor(model => model.IsApproved)*@
+            </th>
+            <th>
+                Tag Number
+                @*@Html.DisplayNameFor(model => model.TagNo)*@
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                @*<td>
+                    @Html.DisplayFor(modelItem => item.ItemType.Name)
+                </td>*@
+                <td>
+                    @Html.DisplayFor(modelItem => item.ItemGroup.Name)
+                </td>
+                @*<td>
+                    @item?.ItemGroup?.DepartmentName
+                </td>*@
+                <td>
+                    @item.ExpiredDate.ToLongDateString()
+                    @if (item.IsApproved == true && item.IsActive == true && item.ExpiredDate.Date <= DateTime.Now.Date)
+                    {
+                        <i class="fa fa-exclamation-triangle" data-toggle="tooltip" data-placement="top" title="Expired"></i>
+                    }
+                    @*@Html.DisplayFor(modelItem => item.ExpiredDate.ToShortDateString())*@
+                </td>
+                <td>
+                    @{string status = "";}
+                    @*@Html.DisplayFor(modelItem => item.IsApproved)*@
+                    @{ if (item.IsApproved == true) status = "APPROVED"; else status = "NOT APPROVED"; }
+                    @status
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TagNo)
+                </td>
+                <td>
+                    @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.UpdateItem) && item.IsActive == true && item.IsApproved != true)
+                    {
+                        <a asp-action="UpdateItem" asp-controller="Item" asp-route-itemId="@item.Id"><i class="fa fa-edit" data-toggle="tooltip" data-placement="top" title="Edit"></i></a>
+                        @*@Html.ActionLink("Edit", "UpdateItem", new { itemId = item.Id /* id=item.PrimaryKey */ })*@ @:|
+                    }
+
+                    <a asp-action="Details" asp-controller="Item" asp-route-itemId="@item.Id"><i class="fa fa-eye" data-toggle="tooltip" data-placement="top" title="Details"></i></a>
+
+                    @* @Html.ActionLink("Details", "Details", new { itemId = item.Id /* id=item.PrimaryKey */ }) |*@
+
+                    @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.DeleteItem) && item.IsActive == true)
+                    {
+                        @:|<a href="#" onClick="Delete('@item.Id', '@url2' )"><i class="fa fa-trash" data-toggle="tooltip" data-placement="top" title="Delete"></i></a>
+                    }
+                    @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.DeleteItem) && item.IsActive == false)
+                    {
+
+                        @:|<a href="#" onClick="Restore('@item.Id', '@url3' )"><i class="fas fa-trash-restore" data-toggle="tooltip" data-placement="top" title="Restore"></i></a>
+                    }
+
+                    @*@if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.ApproveItem) && item.IsApproved == false && item.IsActive == true)
+
+                        @:|<a href="#" onClick="Approve('@item.Id', '@url1' )"><i class="fa fa-check-square" data-toggle="tooltip" data-placement="top" title="Approve"></i></a>
+
+
+                        @*<input type="button" onClick="Approve('@item.Id', '@url1' )" value="Approve" />*@
+                    @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.ApproveItem) && item.IsApproved == false && item.IsActive == true)
+                    {
+                        @:|<a href="#" onClick="Approve('@item.Id', '@url1' )"><i class="fa fa-check-square" data-toggle="tooltip" data-placement="top" title="Approve"></i></a>
+
+
+                        @*<input type="button" onClick="Approve('@item.Id', '@url1' )" value="Approve" />*@
+                    }
+
+                    @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.UpdateService) && item.IsApproved == true && item.IsActive == true && item.ItemType.Name.Equals("servicing", StringComparison.OrdinalIgnoreCase))
+                    {
+                        @:|
+                        <a asp-action="CreateService" asp-controller="Service" asp-route-itemId="@item.Id"><i class="fa fa-wrench" data-toggle="tooltip" data-placement="top" title="Service"></i></a>
+
+
+                        @*@Html.ActionLink("ServiceItem", "CreateService", "Service", new { itemId = item.Id /* id=item.PrimaryKey */ })*@
+
+                    }
+                    @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.UpdateService) && item.IsApproved == true && item.IsActive == true && item.ItemType.Name.Equals("renewal", StringComparison.OrdinalIgnoreCase))
+                    {
+                        @:|
+                        <a asp-action="CreateService" asp-controller="Service" asp-route-itemId="@item.Id"><i class="fa fa-redo" data-toggle="tooltip" data-placement="top" title="Renew"></i></a>
+
+
+                        @*@Html.ActionLink("ServiceItem", "CreateService", "Service", new { itemId = item.Id /* id=item.PrimaryKey */ })*@
+
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<script>
+    function Delete(id, url) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.value) {
+                //Swal.fire(
+                //    'Deleted!',
+                //    'Your file has been deleted.',
+                //    'success'
+                //)
+
+                window.location.replace(url + "?itemId=" + id)
+            }
+        })
+    }
+
+    function Approve(id, url) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, Approve it!'
+        }).then((result) => {
+            if (result.value) {
+                //Swal.fire(
+                //    'Deleted!',
+                //    'Your file has been deleted.',
+                //    'success'
+                //)
+
+                window.location.replace(url + "?itemId=" + id)
+            }
+        })
+    }
+
+    function Restore(id, url) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, Restore it!'
+        }).then((result) => {
+            if (result.value) {
+                //Swal.fire(
+                //    'Deleted!',
+                //    'Your file has been deleted.',
+                //    'success'
+                //)
+
+                window.location.replace(url + "?itemId=" + id)
+            }
+        })
+    }
+</script>
+
+<!-- Modal HTML -->
+@*<div id="myModal" class="modal fade">
+        <div class="modal-dialog modal-confirm">
+            <div class="modal-content">
+                <div class="modal-header">
+                   <div class="icon-box">
+                        <i class="fas fa-times"></i>
+                    </div>
+                    <h4 class="modal-title">Create a new Item</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>Do you really want to delete this Budget? This process cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <form asp-action="Delete" method="post">
+                        <input type="hidden" name="id" value="" />
+                        <button type="button" class="btn btn-info" data-dismiss="modal">Cancel</button>
+                        <input type="submit" value="Delete" class="btn btn-danger" />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>*@

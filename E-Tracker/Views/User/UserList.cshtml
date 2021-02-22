@@ -1,0 +1,104 @@
+﻿@model IEnumerable<E_Tracker.Dto.UserDto>
+
+@{
+    ViewData["Title"] = "User List";
+    var url = this.Url.ActionContext.HttpContext.Request.Scheme;
+    var url2 = $"{@Url.Action("DeleteUser", "User", null, this.Url.ActionContext.HttpContext.Request.Scheme)}";
+    var i = 1;
+}
+
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">List  of Users</h6>
+        @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.CreateUser))
+        {
+            <a asp-action="AddUser" asp-controller="User" class="btn btn-primary float-right">Create New User</a>
+        }
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="myTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>S/N</th>
+                        <th>Surname</th>
+                        <th>OtherName</th>
+                        <th>Email</th>
+<th>Email Confirmed</th>
+                        <th>Department</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model)
+                    {
+                        <tr>
+                            <td>
+                                @i
+                                @{i++;}
+                            </td>
+                            <td>@user.Surname</td>
+                            <td>@user.OtherNames</td>
+                            <td>@user.Email</td>
+<td>@user.EmailConfirmed</td>
+                            <td>
+                                @if (user.Department?.Name?.Any() == true)
+                                {
+                                    @user.Department.Name
+                                }
+                                else
+                                {
+                                    <p>No department</p>
+                                }
+                            </td>
+                            <td>
+                                @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.UpdateUser))
+                                {
+                                    <a asp-action="UpdateUser" asp-controller="User" asp-route-userId="@user.Id"><i class="fa fa-edit" data-toggle="tooltip" data-placement="top" title="Edit"></i></a>
+                                }
+                                @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.DeleteUser))
+                                {
+                                    @:|<a href="#" onClick="Delete('@user.Id', '@url2' )"><i class="fa fa-trash" data-toggle="tooltip" data-placement="top" title="Delete"></i></a>
+                                }
+                                
+                                    |
+                                    <a asp-action="UserDetails" asp-controller="User" asp-route-userId="@user.Id"><i class="fa fa-eye" data-toggle="tooltip" data-placement="top" title="User Details"></i></a> 
+
+                                @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.ViewRole))
+                                {
+                                    @:|
+                                    <a asp-controller="User" asp-action="ResetPassword" asp-route-userId="@user.Id" class="btn btn-primary"><i class="fas fa-user-cog" data-toggle="tooltip" data-placement="top" title="Reset Password"></i></a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    function Delete(id, url) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.value) {
+                //Swal.fire(
+                //    'Deleted!',
+                //    'Your file has been deleted.',
+                //    'success'
+                //)
+
+                window.location.replace(url + "?userId=" + id)
+            }
+        })
+    }
+</script>

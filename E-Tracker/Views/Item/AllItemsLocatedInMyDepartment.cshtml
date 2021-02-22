@@ -1,0 +1,161 @@
+﻿@model IEnumerable<E_Tracker.Dto.ItemDto>
+@inject E_Tracker.Repository.DepartmentRepo.IDepartmentRepository DepartmentRepository
+@{
+    ViewData["Title"] = "AllItems";
+    var url1 = $"{@Url.Action("ApproveItem", "Item", null, this.Url.ActionContext.HttpContext.Request.Scheme)}";
+    var url2 = $"{@Url.Action("DeleteItem", "Item", null, this.Url.ActionContext.HttpContext.Request.Scheme)}";
+
+}
+
+<h1>Items</h1>
+@if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.CreateItem))
+{
+    @*<p>
+       id="createItem" data-target="#myModal" class="trigger-btn" data-toggle="modal"
+        <a asp-action="CreateItem" asp-controller="Item" class="btn btn-primary">Create New</a>
+    </p>*@
+
+}
+<table id="myTable" class="table table-striped table-primary">
+    <thead>
+        <tr>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                Item Type
+            </th>
+            <th>
+                Department
+            </th>
+            <th>
+                Date of Expiry
+                @*@Html.DisplayNameFor(model => model.ExpiredDate)*@
+            </th>
+            <th>
+                Approval Status
+                @*@Html.DisplayNameFor(model => model.IsApproved)*@
+            </th>
+            <th>
+                Tag Number
+                @*@Html.DisplayNameFor(model => model.TagNo)*@
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ItemType.Name)
+                </td>
+                <td>
+                    @{var department = await DepartmentRepository.GetDepartmentByIdAsync(item?.ItemGroup?.DepartmentId); }
+                    @department?.Name
+                </td>
+                <td>
+                    @*@item.ExpiredDate.ToShortDateString()*@
+                    @item.ExpiredDate.ToLongDateString()
+                    @*@Html.DisplayFor(modelItem => item.ExpiredDate.ToShortDateString())*@
+                </td>
+                <td>
+                    @{string status = "";}
+                    @*@Html.DisplayFor(modelItem => item.IsApproved)*@
+                    @{ if (item.IsApproved == true) status = "APPROVED"; else status = "NOT APPROVED"; }
+                    @status
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TagNo)
+                </td>
+                <td>
+
+                    <a asp-action="Details" asp-controller="Item" asp-route-itemId="@item.Id"><i class="fa fa-eye" data-toggle="tooltip" data-placement="top" title="Details"></i></a>
+
+                    @* @Html.ActionLink("Details", "Details", new { itemId = item.Id /* id=item.PrimaryKey */ }) |*@
+
+                    @if (item.IsApproved == true && item.IsActive == true && item.ExpiredDate.Date <= DateTime.Now.Date)
+                    {
+                        @:|
+                        <a asp-action="EscalateItem" asp-controller="Item" asp-route-itemId="@item.Id"><i class="fa fa-exclamation-triangle" data-toggle="tooltip" data-placement="top" title="Escalate"></i></a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<script>
+    function Delete(id, url) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.value) {
+                //Swal.fire(
+                //    'Deleted!',
+                //    'Your file has been deleted.',
+                //    'success'
+                //)
+
+                window.location.replace(url + "?itemId=" + id)
+            }
+        })
+    }
+
+    function Approve(id, url) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, Approve it!'
+        }).then((result) => {
+            if (result.value) {
+                //Swal.fire(
+                //    'Deleted!',
+                //    'Your file has been deleted.',
+                //    'success'
+                //)
+
+                window.location.replace(url + "?itemId=" + id)
+            }
+        })
+    }
+</script>
+
+<!-- Modal HTML -->
+@*<div id="myModal" class="modal fade">
+        <div class="modal-dialog modal-confirm">
+            <div class="modal-content">
+                <div class="modal-header">
+                   <div class="icon-box">
+                        <i class="fas fa-times"></i>
+                    </div>
+                    <h4 class="modal-title">Create a new Item</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>Do you really want to delete this Budget? This process cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <form asp-action="Delete" method="post">
+                        <input type="hidden" name="id" value="" />
+                        <button type="button" class="btn btn-info" data-dismiss="modal">Cancel</button>
+                        <input type="submit" value="Delete" class="btn btn-danger" />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>*@

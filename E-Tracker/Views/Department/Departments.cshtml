@@ -1,0 +1,52 @@
+﻿@model IEnumerable<DepartmentDto>
+
+@{
+    ViewData["Title"] = "Departments";
+    var url = this.Url.ActionContext.HttpContext.Request.Scheme;
+    //var url2 =$"{@Url.Action("DeleteDepartment", "Department", null, this.Url.ActionContext.HttpContext.Request.Scheme)}";
+}
+
+<h1>Departments</h1>
+
+<p>
+    <a asp-action="CreateDepartment" asp-controller="Department" class="btn btn-primary">Create New</a>
+</p>
+<table id="myTable" class="table table-striped table-primary">
+    <thead>
+        <tr>
+            <th>
+                S/N
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @{ int i = 1; }
+        @foreach (var department in Model)
+        {
+            <tr>
+                <td>
+                    @i
+                    @{i++;}
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelDepartment => department.Name)
+                </td>
+
+                <td>
+
+                    @*@Html.ActionLink("Edit", "UpdateDepartment", new { departmentId = department.Id })|*@                 
+                    <a asp-action="UpdateDepartment" asp-controller="Department" asp-route-departmentId="@department.Id"><i class="fa fa-edit" data-toggle="tooltip" data-placement="top" title="Edit"></i></a>
+                </td>
+            </tr>
+         }
+    </tbody>
+</table>
+
+

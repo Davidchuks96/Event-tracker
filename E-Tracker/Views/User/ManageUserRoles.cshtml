@@ -1,0 +1,43 @@
+﻿@model IList<E_Tracker.Dto.UserRolesDto>
+
+@{
+    ViewData["Title"] = "User Roles";
+    var userId = ViewBag.userId;
+}
+
+<div class="card o-hidden border-0 shadow-lg my-5">
+    <div class="card-body p-0">
+        <!-- Nested Row within Card Body -->
+        <div class="row">
+            <div class="col-lg-7">
+                <div class="p-5">
+                    <div class="text-center">
+                        <h1 class="h4 text-gray-900 mb-4">User Roles</h1>
+                    </div>
+                    <form class="user" asp-controller="User" asp-action="ManageUserRoles" asp-route-userId="@userId" method="post">
+                        <input type="hidden" name="userId" value="@userId" />
+                        @for (int i = 0; i < Model.Count; i++)
+                        {
+                            <div class="form-check m-1">
+                                <input type="hidden" asp-for="@Model[i].RoleId" />
+                                <input type="hidden" asp-for="@Model[i].RoleName" />
+                                <input asp-for="@Model[i].IsSelected" class="form-check-input" />
+                                <label class="form-check-label" asp-for="@Model[i].IsSelected">
+                                    @Model[i].RoleName
+                                </label>
+                            </div>
+                        }
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        <button type="submit" class="btn btn-primary btn-user btn-block">
+                            Update
+                        </button>
+                        <hr>
+                        <a asp-controller="User" asp-action="UpdateUser" asp-route-userId="@userId" class="btn btn-danger btn-user btn-block">
+                            Cancel
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

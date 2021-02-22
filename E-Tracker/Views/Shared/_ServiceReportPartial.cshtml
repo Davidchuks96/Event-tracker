@@ -1,0 +1,95 @@
+﻿@model IEnumerable<ServiceDto>
+@inject E_Tracker.Repository.DepartmentRepo.IDepartmentRepository DepartmentRepository
+<div class="card">
+    <!-- Card header -->
+    <div class="card-header">
+        <h3 class="mb-0">Service/Renewal Report</h3>
+    </div>
+
+    <div class="card-body">
+        <!-- Light table -->
+        <div class="table-responsive py-4">
+            <table id="reportTable" class="table align-items-center table-flush">
+                <thead class="thead-light">
+                    <tr>
+                        <th>S/N</th>
+                        <th>Item Name</th>
+                        <th>
+                            Tag Number
+                        </th>
+
+                        <th>
+                            ItemType
+                        </th>
+                        <th>
+                            Item Department
+                        </th>
+                        <th>
+                            Date Serviced/Renewed
+                        </th>
+                        <th>
+                            Next Date of Expiry
+                        </th>
+                        @*<th>
+                                Approval Status
+                            </th>*@
+                        <th>
+                            Serviced by
+                        </th>
+                        <th>
+                            Approved By
+                        </th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int i = 0;
+                    }
+                    @foreach (var service in Model)
+                    {
+                        i = i + 1;
+                        var serviceCreatorName = service.CreatedBy?.Surname + " " + service.CreatedBy?.OtherNames;
+                        var serviceApproverName = service.ServiceApprovedBy?.Surname + " " + service.ServiceApprovedBy?.OtherNames;
+                        <tr>
+                            <td>@(i)</td>
+                            <td class="table-user">
+                                <b>@service.Item?.Name</b>
+                            </td>
+                            <td class="table-user">
+                                <b>@service.Item?.TagNo</b>
+                            </td>
+                            <td class="table-user">
+                                <b>@service.Item?.ItemType?.Name</b>
+                            </td>
+                            <td class="table-user">
+                                <b>
+                                    @{var department = await DepartmentRepository.GetDepartmentByIdAsync(service.Item?.ItemGroup?.DepartmentId); }
+                                    @department?.Name
+                                </b>
+                            </td>
+                            <td class="table-user">
+                                <b>@service.DateServiced.ToString("dd/MM/yyyy")</b>
+                            </td>
+                            <td class="table-user">
+                                <b>@service.NewExpiryDate.ToString("dd/MM/yyyy")</b>
+                            </td>
+                            @*<td class="table-user">
+                                    <b>@Item.IsApproved</b>
+                                </td>*@
+                            <td class="table-user">
+                                <b>@serviceCreatorName</b>
+                            </td>
+                            <td class="table-user">
+                                <b>@serviceApproverName</b>
+                            </td>
+
+                        </tr>
+
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,756 @@
+﻿<!DOCTYPE html>
+@inject SignInManager<User> _signInManager;
+@{ 
+    var baseUrl = Url.Action("Index", "Home", null, this.Url.ActionContext.HttpContext.Request.Scheme);
+    int index = baseUrl.IndexOf("Home");
+    baseUrl = baseUrl.Remove(index - 1);
+}
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>@ViewBag.Title</title>
+
+    <link href="~/admin/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <!-- DataTable CSS-->
+    <link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" type="text/css" rel="stylesheet" />
+    <!-- Custom styles for this template-->
+    <link href="~/admin/css/sb-admin-2.min.css" rel="stylesheet">
+    @*<link href="~/assets/datatables.min.css" rel="stylesheet">*@
+    <!-- Argon CSS -->
+    <!-- Icons -->
+    <link rel="stylesheet" href="~/assets/vendor/nucleo/css/nucleo.css" type="text/css">
+    <link href="~/css/fontawesome.css" rel="stylesheet" />
+    <!-- Special version of Bootstrap that only affects content wrapped in .bootstrap-iso -->
+    <link rel="stylesheet" href="https://formden.com/static/cdn/bootstrap-iso.css" />
+
+    <!--Font Awesome (added because you use icons in your prepend/append)-->
+    <link rel="stylesheet" href="https://formden.com/static/cdn/font-awesome/4.4.0/css/font-awesome.min.css" />
+
+    <!-- Page plugins -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.6.1/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" href="~/assets/vendor/datatables.net-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="~/assets/vendor/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css">
+    <link rel="stylesheet" href="~/assets/vendor/datatables.net-select-bs4/css/select.bootstrap4.min.css">
+
+    <link rel="stylesheet" href="~/assets/css/argon.mine209.css?v=1.0.0" type="text/css">
+    <script src="~/package/dist/sweetalert2.all.min.js"></script>
+
+</head>
+
+<body id="page-top">
+
+    <div id="wrapper">
+        <!-- #Left Sidebar ==================== -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+            <!-- Sidebar - Brand -->
+            <a asp-controller="Admin" asp-action="Dashboard" class="sidebar-brand d-flex align-items-center justify-content-center">
+                <div class="sidebar-brand-icon rotate-n-25">
+                    <img style="height:100%; width:100%;" src="~/admin/img/CyberSpaceLogo.png" alt="logo" />
+                </div>
+                <div class="sidebar-brand-text mx-3">E-Tracker</div>
+            </a>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item active">
+                <a class="nav-link" asp-controller="Admin" asp-action="Dashboard">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            @*<div class="sidebar-heading">
+                    Interface
+                </div>*@
+            @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.ViewUser))
+            {
+                <!-- Nav Item - Pages Collapse Menu -->
+                <li class="nav-item">
+                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                        <i class="fas fa-fw fa-user"></i>
+                        <span>Manage Users</span>
+                    </a>
+                    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                        <div class="bg-white py-2 collapse-inner rounded">
+                            @*<h6 class="collapse-header">Custom Components:</h6>*@
+                            <a class="collapse-item" asp-controller="User" asp-action="UserList">
+                                <i class="fas fa-fw fa-table"></i>
+                                <span>User List</span>
+                            </a>
+                            @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.CreateUser))
+                            {
+                                <a class="collapse-item" asp-controller="User" asp-action="AddUser">
+                                    <i class="fas fas-fw fa-plus"></i>
+                                    <span>Add User</span>
+                                </a>
+                            }
+                            @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.ActivateUser))
+                            {
+                                <a class="collapse-item" asp-controller="User" asp-action="DeactivatedUserList">
+                                    <i class="fas fa-fw fa-table"></i>
+                                    <span>Deactivated User List</span>
+                                </a>
+                            }
+
+                        </div>
+                    </div>
+                </li>
+                <!-- Divider -->
+                <hr class="sidebar-divider">
+            }
+
+            @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.ViewRole))
+            {
+                <!-- Nav Item - Utilities Collapse Menu -->
+                <li class="nav-item">
+                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities" aria-expanded="true" aria-controls="collapseUtilities">
+                        <i class="fas fa-fw fa-pen-square"></i>
+                        <span>Manage Roles</span>
+                    </a>
+                    <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+                        <div class="bg-white py-2 collapse-inner rounded">
+                            <a class="collapse-item" asp-controller="Role" asp-action="RoleList">
+                                <i class="fas fa-fw fa-table"></i>
+                                <span>Role List</span>
+                            </a>
+                            @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.CreateRole))
+                            {
+                                <a class="collapse-item" asp-controller="Role" asp-action="AddRole">
+                                    <i class="fas fas-fw fa-plus"></i>
+                                    <span>Add Role</span>
+                                </a>
+                            }
+                            @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.ActivateRole))
+                            {
+                                <a class="collapse-item" asp-controller="Role" asp-action="DeactivatedRoleList">
+                                    <i class="fas fa-fw fa-table"></i>
+                                    <span>Deactivated Role List</span>
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </li>
+
+            }
+            @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.ViewDepartment))
+            {
+                <li class="nav-item">
+                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDepartments" aria-expanded="true" aria-controls="collapseUtilities">
+                        <i class="fas fa-fw fa-pen-square"></i>
+                        <span>Departments</span>
+                    </a>
+                    <div id="collapseDepartments" class="collapse" aria-labelledby="headingDepartment" data-parent="#accordionSidebar">
+                        <div class="bg-white py-2 collapse-inner rounded">
+
+                            <a class="collapse-item" asp-action="Departments" asp-controller="Department">
+                                <i class="fas fa-fw fa-table"></i>
+                                <span>Department List</span>
+                            </a>
+
+                            @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.CreateDepartment))
+                            {
+                                <a class="collapse-item" asp-action="CreateDepartment" asp-controller="Department">
+                                    <i class="fas fas-fw fa-plus"></i>
+                                    <span>Add Department</span>
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </li>
+            }
+            <!-- Nav Item - Utilities Collapse Menu -->
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseItemGroups" aria-expanded="true" aria-controls="collapseUtilities">
+                    <i class="fas fa-fw fa-pen-square"></i>
+                    <span>ItemGroups</span>
+                </a>
+                <div id="collapseItemGroups" class="collapse" aria-labelledby="headingItems" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.ViewAllItemGroups))
+                        {
+                            <a class="collapse-item" asp-action="AllItemGroupsInEveryDepartment" asp-controller="ItemGroup">
+                                <i class="fas fa-fw fa-table"></i>
+                                <span>General List</span>
+                            </a>
+                        }
+                        <a class="collapse-item" asp-action="AllItemGroupsCreatedByMyDepartment" asp-controller="ItemGroup">
+                            <i class="fas fa-fw fa-table"></i>
+                            <span>Departmental</span>
+                        </a>
+
+                        <a class="collapse-item" asp-action="AllApprovedItemGroups" asp-controller="ItemGroup">
+                            <i class="fas fa-fw fa-table"></i>
+                            <span>Approved</span>
+                        </a>
+
+                        <a class="collapse-item" asp-action="AllNotApprovedItemGroups" asp-controller="ItemGroup">
+                            <i class="fas fa-fw fa-table"></i>
+                            <span>Not Approved</span>
+                        </a>
+
+                        <a class="collapse-item" asp-action="AllItemGroupsLocatedInMyDepartment" asp-controller="ItemGroup">
+                            <i class="fas fa-fw fa-table"></i>
+                            <span>In My Department</span>
+                        </a>
+                        @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.CreateItemGroup))
+                        {
+
+                            <a class="collapse-item" asp-action="CreateItemGroup" asp-controller="ItemGroup">
+                                <i class="fas fas-fw fa-plus"></i>
+                                <span>Add Item Group</span>
+                            </a>
+                        }
+                        @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.ActivateItemGroup))
+                        {
+
+                            <a class="collapse-item" asp-action="AllNotActiveItemGroups" asp-controller="ItemGroup">
+                                <i class="fas fa-fw fa-table"></i>
+                                <span>Inactive ItemGroups</span>
+                            </a>
+                        }
+                    </div>
+                </div>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseItems" aria-expanded="true" aria-controls="collapseUtilities">
+                    <i class="fas fa-fw fa-pen-square"></i>
+                    <span>Items</span>
+                </a>
+                <div id="collapseItems" class="collapse" aria-labelledby="headingItems" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.ViewAllItems))
+                        {
+                            <a class="collapse-item" asp-action="AllItemsInEveryDepartment" asp-controller="Item">
+                                <i class="fas fa-fw fa-table"></i>
+                                <span>General Item List</span>
+                            </a>
+                        }
+                        <a class="collapse-item" asp-action="AllItemsCreatedByMyDepartment" asp-controller="Item">
+                            <i class="fas fa-fw fa-table"></i>
+                            <span>Departmental Items</span>
+                        </a>
+
+                        <a class="collapse-item" asp-action="AllApprovedItems" asp-controller="Item">
+                            <i class="fas fa-fw fa-table"></i>
+                            <span>Approved Items</span>
+                        </a>
+
+                        <a class="collapse-item" asp-action="AllNotApprovedItems" asp-controller="Item">
+                            <i class="fas fa-fw fa-table"></i>
+                            <span>Items Not Approved</span>
+                        </a>
+
+                        <a class="collapse-item" asp-action="AllItemsLocatedInMyDepartment" asp-controller="Item">
+                            <i class="fas fa-fw fa-table"></i>
+                            <span>Items in my Department</span>
+                        </a>
+                        @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.ActivateItem))
+                        {
+
+                            <a class="collapse-item" asp-action="AllNotActiveItems" asp-controller="Item">
+                                <i class="fas fa-fw fa-table"></i>
+                                <span>Inactive Items</span>
+                            </a>
+                        }
+                    </div>
+                </div>
+            </li>
+
+            <!------------------------------------------------------------>
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseCategories" aria-expanded="true" aria-controls="collapseUtilities">
+                    <i class="fas fa-fw fa-pen-square"></i>
+                    <span>Item Categories</span>
+                </a>
+                <div id="collapseCategories" class="collapse" aria-labelledby="headingCategories" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.ViewCategory))
+                        {
+
+                            <a class="collapse-item" asp-action="AllCategories" asp-controller="Category">
+                                <i class="fas fa-fw fa-table"></i>
+                                <span>All Categories</span>
+                            </a>
+
+                        }
+                        @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.ActivateCategory))
+                        {
+                            <a class="collapse-item" asp-action="AllNotActiveCategories" asp-controller="Category">
+                                <i class="fas fa-fw fa-table"></i>
+                                <span>InActive Categories</span>
+                            </a>
+
+                        }
+
+                        @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.CreateCategory))
+                        {
+
+                            <a class="collapse-item" asp-action="CreateCategory" asp-controller="Category">
+                                <i class="fas fas-fw fa-plus"></i>
+                                <span>Add Category</span>
+                            </a>
+                        }
+                        @*}*@
+
+                    </div>
+                </div>
+            </li>
+
+
+
+
+            @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.ViewItemType))
+            {
+                <li class="nav-item">
+                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseItemTypes" aria-expanded="true" aria-controls="collapseUtilities">
+                        <i class="fas fa-fw fa-pen-square"></i>
+                        <span>Item Types</span>
+                    </a>
+                    <div id="collapseItemTypes" class="collapse" aria-labelledby="headingItemTypes" data-parent="#accordionSidebar">
+                        <div class="bg-white py-2 collapse-inner rounded">
+                            <a class="collapse-item" asp-action="AllItemTypes" asp-controller="ItemType">
+                                <i class="fas fa-fw fa-table"></i>
+                                <span>Item Type List</span>
+                            </a>
+                            @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.CreateItemType))
+                            {
+                                <a class="collapse-item" asp-action="CreateItemType" asp-controller="ItemType">
+                                    <i class="fas fas-fw fa-plus"></i>
+                                    <span>Add Item Type</span>
+                                </a>
+
+                            }
+
+                            @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.ActivateItemType))
+                            {
+
+                                <a class="collapse-item" asp-action="AllNotActiveItemTypes" asp-controller="ItemType">
+                                    <i class="fas fa-fw fa-table"></i>
+                                    <span>InActive ItemTypes</span>
+                                </a>
+                            }
+
+                        </div>
+                    </div>
+                </li>
+            }
+            <!-- Nav Item - Utilities Collapse Menu -->
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseServices" aria-expanded="true" aria-controls="collapseUtilities">
+                    <i class="fas fa-fw fa-pen-square"></i>
+                    <span>Services/Renewals</span>
+                </a>
+                <div id="collapseServices" class="collapse" aria-labelledby="headingServices" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <a class="collapse-item" asp-action="Services" asp-controller="Service">
+                            <i class="fas fa-fw fa-table"></i>
+                            <span>Services/Renewals</span>
+                        </a>
+                        <a class="collapse-item" asp-action="ServiceHistory" asp-controller="Service">
+                            <i class="fas fa-fw fa-table"></i>
+                            <span>Service/Renewal History</span>
+                        </a>
+                    </div>
+                </div>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseReports" aria-expanded="true" aria-controls="collapseUtilities">
+                    <i class="fas fa-fw fa-pen-square"></i>
+                    <span>Reports</span>
+                </a>
+                <div id="collapseReports" class="collapse" aria-labelledby="headingServices" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <a class="collapse-item" asp-action="ItemReport" asp-controller="Report">
+                            <i class="fas fa-fw fa-table"></i>
+                            <span>Item Report</span>
+                        </a>
+                        <a class="collapse-item" asp-action="ServiceReport" asp-controller="Report">
+                            <i class="fas fa-fw fa-table"></i>
+                            <span>Service/Renewal Report</span>
+                        </a>
+                    </div>
+                </div>
+            </li>
+
+
+            <!-- Divider -->
+            <hr class="sidebar-divider d-none d-md-block">
+
+            <!-- Sidebar Toggler (Sidebar) -->
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+            </div>
+        </ul>
+
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <div id="content">
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+                    <!-- Topbar Navbar -->
+                    <ul class="navbar-nav ml-auto">
+
+                        <!-- Nav Item - Search Dropdown (Visible Only XS) -->
+                        <li class="nav-item dropdown no-arrow d-sm-none">
+                            <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-search fa-fw"></i>
+                            </a>
+                            <!-- Dropdown - Messages -->
+                            <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in" aria-labelledby="searchDropdown">
+                                <form class="form-inline mr-auto w-100 navbar-search">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" type="button">
+                                                <i class="fas fa-search fa-sm"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </li>
+
+                        <!-- Nav Item - Alerts -->
+                        <li class="nav-item dropdown no-arrow mx-1">
+                            <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-toggle="popover" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-bell fa-fw"></i>
+                                <span id="bell" class="badge badge-danger badge-counter"></span>
+                            </a>
+                        </li>
+
+                        <div class="topbar-divider d-none d-sm-block"></div>
+
+                        <!-- Nav Item - User Information -->
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">@User.Identity.Name</span>
+                            </a>
+                            <!-- Dropdown - User Information -->
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                                <a class="dropdown-item" asp-controller="User" asp-action="UserProfile">
+                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Profile
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Logout
+                                </a>
+                            </div>
+                        </li>
+                    </ul>
+                </nav>
+
+                <div class="container-fluid">
+                    <div>
+
+                        <partial name="_Notifications" />
+                        @RenderBody()
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="sticky-footer bg-white">
+        <div class="container my-auto">
+            <div class="copyright text-center my-auto">
+                <span>Copyright &copy; @DateTime.Now.Year</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <form method="post" asp-controller="Account" asp-action="Logout">
+                        <button type="submit" class="btn btn-primary">Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="~/admin/vendor/jquery/jquery.min.js"></script>
+    <script src="~/admin/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="~/admin/vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="~/admin/js/sb-admin-2.min.js"></script>
+
+    <!-- Page level custom scripts -->
+    @*<script src="~/admin/js/demo/chart-area-demo.js"></script>
+    <script src="~/assets/datatables.min.js"></script>
+    <script src="~/admin/js/demo/chart-pie-demo.js"></script>*@
+
+    <!-- Optional JS -->
+    <script src="~/assets/vendor/chart.js/dist/Chart.min.js"></script>
+    <script src="~/assets/vendor/chart.js/dist/Chart.extension.js"></script>
+    <script src="~/assets/vendor/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <script src="~/assets/vendor/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/assets/vendor/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="~/assets/vendor/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/assets/vendor/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
+
+    <script src="~/assets/vendor/cdnjs/jszip.min.js"></script>
+    <script src="~/assets/vendor/cdnjs/pdfmake.min.js"></script>
+    <script src="~/assets/vendor/cdnjs/vfs_fonts.js"></script>
+
+
+
+
+    <script src="~/assets/vendor/datatables.net-buttons/js/buttons.html5.min.js"></script>
+    <script src="~/assets/vendor/datatables.net-buttons/js/buttons.flash.min.js"></script>
+    <script src="~/assets/vendor/datatables.net-buttons/js/buttons.print.min.js"></script>
+    <script src="~/assets/vendor/datatables.net-select/js/dataTables.select.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#myTable').DataTable();
+
+            console.log('BaseUrl:' + '@baseUrl' + '');
+        });
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function (){
+            $(".button").click(function () {
+                $(this).addClass("active");
+            });
+        });
+    </script>
+
+    <script src="~/lib/signalr/signalr.js"></script>
+
+    <script type="text/javascript">
+        //function textClick(e) {
+        //    console.log(e);
+        //    //debugger
+        //    var e;
+        //    var target = e.target;
+        //    var id = $(target).data('id');
+        //    readNotification(id, target);
+        //}
+        $(function () {
+            $('[data-toggle="popover"]').popover({
+                html: true,
+                placement: 'bottom',
+                animation: true,
+                content: function () {
+                    return $("#notification-content").html();
+                },
+            });
+            $('#alertsDropdown').on('shown.bs.popover', function () {
+                //debugger
+                var list = document.getElementsByClassName("anchorClose");
+                //console.log('document:' + list);
+                for (var i = 0; i < list.length; i++) {
+                    //console.log(list[i]); //FIRST console output
+                    //console.log(list[i].id); //second console output
+                    list[i].addEventListener("click", function (e) {
+                        ////debugger
+                        //console.log('pelenotify:', e);
+                        var target = e.currentTarget.offsetParent;
+                        //console.log('target:', target);
+                        var id = e.currentTarget.offsetParent.id;
+                        //console.log('id:', id);
+                        //debugger
+                        //var id = $(target).data('id');
+                        readNotification(id, target);
+                        //var target = e.target;
+                        //var id = $(target).data('id');
+                        //readNotification(id, target);
+                    });
+                }
+                //c.forEach(element => {
+
+                //});
+
+                //$('#anchorClose').on('click', function (e) {
+                //console.log('pelenotify:', e);
+                //var target = e.target;
+                //var id = $(target).data('id');
+                //readNotification(id, target);
+            });
+
+            $('body').append(`<div style="display:none;" id="notification-content"></div>`)
+            function getNotification() {
+                var res = "<ul class='list-group'>";
+                $.ajax({
+                    url: "@baseUrl/Notification/getNotification",
+                    method: "GET",
+                    success: function (result) {
+                        console.log(result);
+                        console.log(result.count);
+                        if (result.count != 0) {
+                            $("#notificationCount").html(result.count);
+                            $("#notificationCount").show('slow');
+                        } else {
+                            //$("#notificationCount").html();
+                            $("#notificationCount").hide('slow');
+                            $(
+                                "#notificationCount").popover('hide');
+                            res = res +
+                                "<li class='list-group-item notification-text' style='color:black'>You have no notifications here</li>";
+                        }
+                        var notifications = result.userNotification;
+                        for (var i = 0; i < notifications.length; i++) {
+                            //notifications.some(element => {
+                            console.log('element:' + notifications[i])
+
+                            console.log('element.notificationType:' + notifications[i].notificationType)
+                            var d = new Date(notifications[i].dateCreated);
+                            console.log('date:' + notifications[i].dateCreated)
+                            var options = { year: 'numeric', month: 'short', weekday: 'long', day: '2-digit', hour: 'numeric', minute: 'numeric', hour12: true, };
+                            var _resultDate = new Intl.DateTimeFormat('en-GB', options).format(d);
+                            //To approve Item
+                            if (notifications[i].notificationType == 0) {
+                                //console.log('element.Id:' + notifications[i].id)
+
+
+                                //console.log('ResultDate' + _resultDate)
+                                res = res +
+                                    "<li class='list-group-item notification-text alert' style='color:black' id='" + notifications[i].id + "'>" +
+                                    "<a href='#' class='close btn anchorClose'  aria-label='Close'><span aria-hidden='true'>&times;</span>" +
+                                    "</a>" +
+                                    notifications[i].text + " Kindly view<a href='@baseUrl/Item/Details?itemId=" + notifications[i].itemId + "' target='_blank'> here</a>." +
+                                    "<br/><small>" + _resultDate + "</small>"
+                                "</li>";
+
+
+                                //console.log('res:' + res);
+                            } else if (notifications[i].notificationType == 2) {
+                                res = res +
+                                    "<li class='list-group-item notification-text alert' style='color:black' id='" + notifications[i].id + "'>" +
+                                    "<a href='#' class='close btn anchorClose'  aria-label='Close'><span aria-hidden='true'>&times;</span>" +
+                                    "</a>" +
+                                    notifications[i].text + " Kindly view<a href='@baseUrl/Service/Details?serviceId=" + notifications[i].serviceId + "' target='_blank'> here</a>." +
+                                    "<br/><small>" + _resultDate + "</small>"
+                                "</li>";
+                            }
+                            else if (notifications[i].notificationType == 4) {
+                                res = res +
+                                    "<li class='list-group-item notification-text alert' style='color:black' id='" + notifications[i].id + "'>" +
+                                    "<a href='#' class='close btn anchorClose'  aria-label='Close'><span aria-hidden='true'>&times;</span>" +
+                                    "</a>" +
+                                    notifications[i].text + " Kindly view<a href='@baseUrl/ItemGroup/Details?itemGroupId=" + notifications[i].itemGroupId + "' target='_blank'> here</a>." +
+                                    "<br/><small>" + _resultDate + "</small>"
+                                "</li>";
+                            }
+                            //Approved Item
+                            else {
+                                res = res +
+                                    "<li class='list-group-item notification-text' style='color:black' id='" + notifications[i].id + "'>" +
+                                    "<a href='#' class='close btn anchorClose'  aria-label='Close'><span aria-hidden='true'>&times;</span>" +
+                                    "</a>" +
+                                    notifications[i].text + "<br/><small>" + _resultDate + "</small></li>";
+                            }
+                            //console.log('i:' + i)
+                            if (i === 2) {
+                                res = res + "<li class='list-group-item notification-text' style='color:black;text-align:center'><a href='@baseUrl/Notification/AllNotifications'>See all notifications</a></li>";
+                                break
+                            }
+                        };
+                        res = res + "</ul>";
+                        //console.log(result.count)
+                        $("#bell").html(result.count);
+                        $("#notification-content").html(res);
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+            }
+
+            //function textClick(e) {
+            //    //debugger;
+            //    console.log(e);
+            //    // var e;
+            //    // var target = e.target;
+            //    var id = $(target).data('id');
+
+            //    readNotification(id, target);
+            //}
+
+            $("ul").on('click', 'li.notification-text', function (e) {
+                console.log('pelenotify:', e);
+                var target = e.target;
+                var id = $(target).data('id');
+                readNotification(id, target);
+            });
+
+            $("a.close.btn").on('click', function (e) {
+                //debugger
+                var target = e.target;
+                //var id = $(target).data('id');
+                var id = target.parentNode.id;
+                readNotification(id, target);
+            })
+
+            function readNotification(id, target) {
+                $.ajax({
+                    url: "@baseUrl/Notification/ReadNotificationAjax",
+                    method: "GET",
+                    data: { notificationId: id },
+                    success: function (result) {
+                        //debugger
+                        getNotification();
+                        $(target).fadeOut('slow');
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                })
+            }
+            getNotification();
+            const connection = new signalR.HubConnectionBuilder()
+                .withUrl("@baseUrl/signalServer")
+                .build();
+            connection.on('displayNotification', function () {
+                getNotification();
+            });
+            connection.start();
+        });
+
+    </script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
+
+

@@ -1,0 +1,71 @@
+﻿@model IEnumerable<E_Tracker.Dto.RoleDto>
+
+@{
+    ViewData["Title"] = "Role List";
+    var url = this.Url.ActionContext.HttpContext.Request.Scheme;
+    var url2 = $"{@Url.Action("DeleteRole", "Role", null, this.Url.ActionContext.HttpContext.Request.Scheme)}";
+    var i = 1;
+}
+
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">List  of Roles</h6>
+        <a asp-action="AddRole" asp-controller="Role" class="btn btn-primary float-right">Create New Role</a>
+    </div>
+    
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="myTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>S/N</th>
+                        <th>Name</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var role in Model)
+                    {
+                        <tr>
+                            <td>
+                                @i
+                                @{i++;}
+                            </td>
+                            <td>@role.Name</td>
+                            <td>
+                                <a asp-action="EditRole" asp-controller="Role" asp-route-roleId="@role.Id"><i class="fa fa-edit" data-toggle="tooltip" data-placement="top" title="Edit"></i></a>|
+                                <a href="#" onClick="Delete('@role.Id', '@url2' )"><i class="fa fa-trash" data-toggle="tooltip" data-placement="top" title="Delete"></i></a>|
+                                <a asp-controller="Permission" asp-action="RoleClaims" asp-route-roleId="@role.Id" class="btn btn-primary">Permissions</a>
+                            </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function Delete(id, url) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.value) {
+                        //Swal.fire(
+                        //    'Deleted!',
+                        //    'Your file has been deleted.',
+                        //    'success'
+                        //)
+
+                        window.location.replace(url + "?roleId=" + id)
+                    }
+                })
+            }
+        </script>

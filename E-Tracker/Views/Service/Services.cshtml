@@ -1,0 +1,96 @@
+﻿@model IEnumerable<ServiceDto>
+@inject E_Tracker.Repository.DepartmentRepo.IDepartmentRepository DepartmentRepository
+@{
+    ViewData["Title"] = "Services";
+    var url1 = $"{@Url.Action("ApproveService", "Service", null, this.Url.ActionContext.HttpContext.Request.Scheme)}";
+}
+
+<h1>Services/Renewals</h1>
+<table id="myTable" class="table table-striped table-primary">
+    <thead>
+        <tr>
+            <th>
+                Service Department
+            </th>
+            <th>
+                Item Name
+            </th>
+            <th>
+                Date Serviced
+            </th>
+            <th>
+                Date of Expiration
+            </th>
+            <th>
+                Item Department
+            </th>
+            <th>
+                Approval Status
+            </th>
+            <th>
+
+            </th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var service in Model)
+        {
+            <tr>
+                <td>
+                    @service.ServiceDepartment?.Name
+                </td>
+                <td>
+                    @service.Item?.Name
+                </td>
+                <td>
+                    @service.DateServiced.ToShortDateString()
+                </td>
+                <td>
+                    @service.NewExpiryDate.ToShortDateString()
+                </td>
+                <td>@{var department = await DepartmentRepository.GetDepartmentByIdAsync(service.Item?.ItemGroup?.DepartmentId); }
+                @department?.Name
+                </td>
+                <td>
+                    @{string status = "";}
+                    @{ if (service.IsServiceApproved == true) status = "APPROVED"; else status = "NOT APPROVED"; }
+                    @status
+                </td>
+                <td>
+
+                    <a asp-action="Details" asp-controller="Service" asp-route-serviceId="@service.Id"><i class="fa fa-eye" data-toggle="tooltip" data-placement="top" title="Details"></i></a>
+
+                    @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.ApproveService) && service.IsServiceApproved == false && service.IsActive == true)
+                    {
+                        @:|
+                        <a href="#" onClick="Approve('@service.Id', '@url1' )"><i class="fa fa-check-square" data-toggle="tooltip" data-placement="top" title="Approve"></i></a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<script>
+    function Approve(id, url) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, Approve it!'
+        }).then((result) => {
+            if (result.value) {
+                //Swal.fire(
+                //    'Deleted!',
+                //    'Your file has been deleted.',
+                //    'success'
+                //)
+
+                window.location.replace(url + "?serviceId=" + id)
+            }
+        })
+    }
+</script>

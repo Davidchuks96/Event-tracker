@@ -1,0 +1,99 @@
+﻿@model ItemDto
+@{
+    var itemTypes = ViewBag.Itemtypes;
+    var returnUrl = Model.ReturnUrl ?? "/Item/AllItemsCreatedByMyDepartment";
+}
+
+<div class="row">
+    <div class="col-lg-2"></div>
+    <div class="col-lg-8">
+        <div class="card o-hidden border-0 shadow-lg my-5">
+            <div class="card-body p-0">
+                <!-- Nested Row within Card Body -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="p-5">
+                            <div class="text-center">
+                                <h1 class="h4 text-gray-900 mb-4">Update @Model.Name for @Model.ItemGroup?.Name</h1>
+                            </div>
+                            <form class="user" asp-action="UpdateItem" asp-controller="Item" method="post">
+                                <div asp-validation-summary="All" class="text-danger"></div>
+                                <input asp-for="Id" type="hidden" />
+                                <input asp-for="ItemGroupId" hidden />
+                                <input asp-for="ReturnUrl" hidden />
+                                <input asp-for="IsActive" type="hidden" />
+                                <div class="form-group row">
+                                    <div class="col-sm-6 mb-3 mb-sm-0">
+                                        <input asp-for="Name" type="text" class="form-control form-control-user" id="Name" placeholder="Name">
+                                        <span asp-validation-for="Name" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <input asp-for="TagNo" type="text" class="form-control form-control-user" id="TagNo" placeholder="Tag Number" readonly="readonly">
+                                        <span asp-validation-for="TagNo" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                                @*<div class="form-group">
+            @Html.DropDownListFor(x => x.DepartmentId, new SelectList((departments), "Id", "Name"), "Select Department", new { Id = "departmentId", @class = "form-control" })
+        </div>*@
+
+                                <div class="form-group">
+                                    @Html.DropDownListFor(x => x.ItemTypeId, new SelectList((itemTypes), "Id", "Name"), "Select Itemtype", new { Id = "itemTypeId", @class = "form-control" })
+                                </div>
+
+                                @*<div class="form-group">
+            @Html.DropDownListFor(x => x.CategoryId, new SelectList((categories), "Id", "Name"), "Select Category", new { Id = "categoryId", @class = "form-control" })
+        </div>*@
+                                <div class="form-group row">
+                                    <div class="col-sm-6 mb-3 mb-sm-0">
+                                        <label asp-for="ExpiredDate">Date of Expiry</label>
+                                        <input asp-for="ExpiredDate" type="date" class="form-control form-control-user" id="date" placeholder="" readonly="readonly">
+                                        <span asp-validation-for="ExpiredDate" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <div class="col-sm-6 mb-3 mb-sm-0">
+                                        <label asp-for="ReoccurenceValue">Subscription reoccurence value</label>
+                                        <input asp-for="ReoccurenceValue" type="number" class="form-control form-control-user" id="reoccurence" placeholder="">
+                                        <span asp-validation-for="ReoccurenceValue" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-sm-6 mb-3 mb-sm-0">
+                                        <label asp-for="ReoccurenceFrequency"></label>
+                                        @Html.DropDownList("ReoccurenceFrequency", Html.GetEnumSelectList<ReoccurenceFrequency>(), "Select Frequency", new { @class = "form-control" })
+                                        <span asp-validation-for="ReoccurenceFrequency" class="text-danger"></span>
+                                    </div>
+
+                                </div>
+
+                                <div class="form-group row">
+
+                                    <div class="col-sm-6 mb-3">
+                                        <label asp-for="NotificationPeriod"></label>
+                                        @Html.DropDownList("NotificationPeriod", Html.GetEnumSelectList<ReoccurenceFrequency>(), "Select Notification Period", new { @class = "form-control" })
+                                        <span asp-validation-for="NotificationPeriod" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-sm-6 mb-3">
+                                        <label asp-for="NotificationFrequency"></label>
+                                        @Html.DropDownList("NotificationFrequency", Html.GetEnumSelectList<NotificationFrequency>(), "Select Frequency", new { @class = "form-control" })
+                                        <span asp-validation-for="NotificationFrequency" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+
+                                <button type="submit" class="btn btn-primary btn-user btn-block">
+                                    Update Item
+                                </button>
+
+                                <a href="@returnUrl" class="btn btn-primary btn-user btn-block">Cancel</a>
+
+                                <hr>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

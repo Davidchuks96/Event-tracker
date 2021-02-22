@@ -1,0 +1,124 @@
+﻿@model CreateServiceDto
+@{
+    ViewData["Title"] = "Create Service";
+}
+
+<h1>Report Service/Renewal for @ViewBag.Item?.Name with @ViewBag.Item?.TagNo</h1>
+<div class="form-group row mb-1">
+    <div class="col-sm-6 mb-3 mb-sm-0">
+        <div class="form-group">
+            <label class="font-weight-bold display-6">Name</label>
+            <p>@ViewBag.Item?.Name</p>
+        </div>
+
+    </div>
+    <div class="col-sm-6 mb-3 mb-sm-0">
+        <div class="form-group">
+            <label class="font-weight-bold display-6">Tag Number</label>
+            <p>@ViewBag.Item?.TagNo</p>
+        </div>
+    </div>
+</div>
+<div class="form-group row mb-1">
+    <div class="col-sm-6 mb-3 mb-sm-0">
+        <div class="form-group">
+            <label class="font-weight-bold display-6">Reoccurence Value</label>
+            <p>@ViewBag.Item?.ReoccurenceValue</p>
+        </div>
+
+    </div>
+    <div class="col-sm-6 mb-3 mb-sm-0">
+        <div class="form-group">
+            <label class="font-weight-bold display-6">Reoccurence Frequency</label>
+            <p>@ViewBag.Item?.ReoccurenceFrequency</p>
+        </div>
+    </div>
+</div>
+<form method="post" asp-action="CreateService" asp-controller="Service">
+    <input type="Hidden" hidden asp-for="ItemId" />
+    <input type="Hidden" hidden asp-for="ServiceDepartmentId" />
+    <input type="Hidden" hidden asp-for="CreatedById" />
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="form-group row">
+        <div class="col-sm-6 mb-3 mb-sm-0">
+            <label asp-for="DateServiced">Date Serviced/Renewed</label>
+            @{ var dateServiced = Model.DateServiced != DateTime.MinValue ? Model.DateServiced.ToString("yyyy-MM-dd") : DateTime.Now.ToString("MM/dd/yyyy");}
+            <input asp-for="DateServiced" type="date" max="@DateTime.Now.ToString("yyyy-MM-dd")" value="@dateServiced" class="form-control form-control-user" id="dateServiced" placeholder="">
+            <span asp-validation-for="DateServiced" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <div class="col-sm-6 mb-3 mb-sm-0">
+            <label class="mb-1" asp-for="Comments">Please provide your comments here</label>
+            @*<input asp-for="Comments" type="text" value="@Model.Comments" class="form-control-user" id="comments" placeholder="Write in your comments here....">*@
+            <p>
+                <textarea class="form-control" placeholder="Write in your comments here...." cols="20" id="comments" name="comments" rows="5"></textarea>
+            </p>
+            <span asp-validation-for="Comments" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="custom-control custom-checkbox">
+        <input type="checkbox" asp-for="IsANewCycle" class="custom-control-input" id="customCheckbox1">
+        <label class="custom-control-label" for="customCheckbox1">Start a new servicing/renewal cycle?</label>
+    </div>
+    <div class="custom-control custom-checkbox">
+        <input type="checkbox" asp-for="IsANewReoccurenceFrequency" class="custom-control-input" id="customCheckbox2">
+        <label class="custom-control-label" for="customCheckbox2">Change the reoccurence frequency?</label>
+    </div>
+
+    <div class="form-group row" id="newReoccurenceFreq" hidden>
+        <div class="col-sm-6 mb-3 mb-sm-0">
+            <label asp-for="NewReoccurenceValue">Subscription reoccurence value</label>
+            <input asp-for="NewReoccurenceValue" type="number" min="0" class="form-control form-control-user" id="reoccurence" placeholder="">
+            <span asp-validation-for="NewReoccurenceValue" class="text-danger"></span>
+        </div>
+        <div class="col-sm-6"></div>
+        <div class="col-sm-6 mb-3 mb-sm-0">
+            <label asp-for="NewReoccurenceFrequency">New Reoccurence Frequency</label>
+            @Html.DropDownList("NewReoccurenceFrequency", Html.GetEnumSelectList<ReoccurenceFrequency>(), "Select Frequency", new { @class = "form-control" })
+            <span asp-validation-for="NewReoccurenceFrequency" class="text-danger"></span>
+        </div>
+    </div>
+
+
+    <button type="submit" class="btn btn-primary btn-user">
+        Confirm Service
+    </button>
+</form>
+@section  Scripts
+{
+    <script>
+        $(document).ready(function () {
+            //$("#customCheckbox1").click(function () {
+            //    if ($(this).prop("checked") == true) {
+            //        $("#newExpiryDateDiv").removeAttr("hidden");
+            //        $("#newExpiryDate").attr("required",true);
+            //        console.log("Checkbox is checked.");
+            //    }
+            //    else if ($(this).prop("checked") == false) {
+            //        $("#newExpiryDateDiv").attr("hidden", true);
+            //        $("#newExpiryDate").attr("required",false);
+            //        console.log("Checkbox is unchecked.");
+            //    }
+            //});
+            $("#customCheckbox2").click(function () {
+                if ($(this).prop("checked") == true) {
+                    $("#newReoccurenceFreq").removeAttr("hidden");
+                       $("#reoccurence").attr("required",true);
+                    $("#NewReoccurenceFrequency").attr("required",true);
+                    console.log("Checkbox is checked.");
+                }
+                else if ($(this).prop("checked") == false) {
+                    $("#newReoccurenceFreq").attr("hidden", true);
+                    $("#reoccurence").attr("required",false);
+                    $("#NewReoccurenceFrequency").attr("required",false);
+                    console.log("Checkbox is unchecked.");
+                }
+            });
+    });
+    </script>
+
+}
+
+

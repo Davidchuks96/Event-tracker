@@ -1,0 +1,49 @@
+﻿@model E_Tracker.Dto.RoleClaimsDto
+
+@{
+    ViewData["Title"] = "Role Permissions";
+}
+
+<div class="card o-hidden border-0 shadow-lg my-5">
+    <div class="card-body p-0">
+        <!-- Nested Row within Card Body -->
+        <div class="row">
+            <div class="col-lg-7">
+                <div class="p-5">
+                    <div class="text-center">
+                        <h1 class="h4 text-gray-900 mb-4">Role Permissions for @Model.RoleName</h1>
+                    </div>
+                    @if (Model.Claims.Any(cl => cl.IsSelected == true))
+                    {
+                        for (int i = 0; i < Model.Claims.Count; i++)
+                        {
+                            if (Model.Claims[i].IsSelected)
+                            {
+                                <div class="form-check m-1">
+
+                                    <label class="form-check-label" asp-for="@Model.Claims[i].IsSelected">
+                                        @Model.Claims[i].ClaimValue
+                                    </label>
+                                </div>
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <p>No permissions at the moment</p>
+                    }
+                    <div asp-validation-summary="All" class="text-danger"></div>
+
+                </div>
+            @if (Model.IsRoleActive)
+            {
+                <a asp-action="RoleList" asp-controller="Role" class="btn btn-primary ml-3 mb-3">Go back</a>
+            }
+            else
+            {
+                <a asp-action="DeactivatedRoleList" asp-controller="Role" class="btn btn-primary ml-3 mb-3">Go back</a>
+            }
+            </div>
+        </div>
+    </div>
+</div>

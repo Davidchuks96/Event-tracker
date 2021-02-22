@@ -1,0 +1,175 @@
+﻿@model E_Tracker.Dto.DashboardDto
+@inject E_Tracker.Repository.DepartmentRepo.IDepartmentRepository DepartmentRepository
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    int i = 1;
+}
+
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+</div>
+
+<div class="row">
+
+    <!-- Earnings (Monthly) Card Example -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">All Items</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            <h2>@Model.AllItems</h2>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-archive fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Earnings (Monthly) Card Example -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">All Active Items</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            <h2>@Model.AllActiveItems</h2>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Requests Card Example -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">All Expired Items</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            <h2>@Model.AllExpiredItems</h2>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-trash fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">Items Approaching Expiration  </h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="myFiveRecentTable" class="table table-striped table-primary">
+                        <thead>
+                            <tr>
+                                <th>S/N</th>
+                                <th>Name</th>
+
+                                <th>ItemType</th>
+                                <th>ItemGroup</th>
+
+                                <th>Department</th>
+
+                                <th>Date of Expiry</th>
+
+                                <th>Approval Status</th>
+
+                                <th> Tag Number</th>
+
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.ApproachingExipringDate)
+                            {
+                                <tr>
+                                    <td>@i</td>
+                                    <td>@item.Name</td>
+
+                                    <td>@item.ItemType?.Name</td>
+                                    <td>@item.ItemGroup?.Name</td>
+
+                                    <td>@{var department = await DepartmentRepository.GetDepartmentByIdAsync(item.ItemGroup?.DepartmentId); }
+                                    @department?.Name
+                                    </td>
+                                    <td>
+                                        @(String.Format("{0:dd/MM/yyyy}", item.ExpiredDate))
+                                    @if (item.IsApproved == true && item.IsActive == true && item.ExpiredDate.Date <= DateTime.Now.Date)
+                                    {
+                                        <i class="fa fa-exclamation-triangle" data-toggle="tooltip" data-placement="top" title="Expired"></i>
+                                    }
+                                </td>
+                                <td>
+                                    @{string status = "";}
+                                    @{ if (item.IsApproved == true) status = "APPROVED"; else status = "NOT APPROVED"; }
+                                    @status
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.TagNo)
+                                </td>
+                                @*<td>
+                                        <a href="@Url.Action("ItemInvoice","Item", new {ItemId = item.Id,style=1})" title="Invoice 1" class="btn btn-icon btn-primary btn-xs m-b-5"><i class="fa fa-print"> </i> </a>
+
+                                        <a href="@Url.Action("ItemInvoice","Item", new {ItemId = item.Id,style=2})" title="Invoice 2" class="btn btn-icon btn-primary btn-xs m-b-5"><i class="fa fa-print"> </i> </a>
+                                    </td>*@
+                            </tr>
+                            i++;
+                        }
+
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts
+    {
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('#myFiveRecentTable').DataTable(
+                {
+                    dom: "Bfrtip",
+                    buttons: [
+                        'copy',
+                         {
+                            extend: 'excel',
+                             title: 'Report of Items Approaching Exipring Date Two weeks from  @DateTime.Now.ToString("dd/MM/yyyy")'
+                         },
+                         {
+                            extend: 'print',
+                             title: 'Report of Items Approaching Exipring Date Two weeks from  @DateTime.Now.ToString("dd/MM/yyyy")'
+                         },
+                         {
+                            extend: 'pdf',
+                             title: 'Report of Items Approaching Exipring Date Two weeks from  @DateTime.Now.ToString("dd/MM/yyyy")'
+                         }
+                    ]
+                }
+            );
+
+            $('.buttons-copy, .buttons-excel, .buttons-pdf, .buttons-print').removeClass('btn btn-secondary').addClass('btn-primary mb-2 mr-2');
+        });
+
+    </script>
+}

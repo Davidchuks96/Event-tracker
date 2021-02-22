@@ -1,0 +1,24 @@
+﻿@model ErrorViewModel
+@{
+    ViewData["Title"] = "Error";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Error</title>
+</head>
+<body class="app">
+    <div class="container-fluid">
+        <!-- 404 Error Text -->
+        <div class="text-center">
+            <div class="error mx-auto" data-text="404">404</div>
+            <p class="text-gray-500 mb-0">It looks like you found a glitch in the matrix...</p>
+            <a asp-controller="Admin" asp-action="Dashboard">&larr; Back to Dashboard</a>
+        </div>
+
+    </div>
+</body>
+</html>

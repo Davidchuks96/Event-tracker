@@ -1,0 +1,172 @@
+﻿@model IEnumerable<ItemTypeDto>
+
+@{
+    ViewData["Title"] = "AllItemTypes";
+    var url = this.Url.ActionContext.HttpContext.Request.Scheme;
+    var url2 = $"{@Url.Action("DeleteItemType", "ItemType", null, this.Url.ActionContext.HttpContext.Request.Scheme)}";
+    var url3 = $"{@Url.Action("ActivateItemType", "ItemType", null, this.Url.ActionContext.HttpContext.Request.Scheme)}";
+    var s = "";
+
+}
+
+<h1>ItemTypes</h1>
+
+<p>
+    @*id="createItemType" data-target="#myModal" class="trigger-btn" data-toggle="modal"*@
+    <a asp-action="CreateItemType" asp-controller="ItemType" class="btn btn-primary">Create New</a>
+</p>
+<table id="myTable" class="table table-striped table-primary">
+    <thead>
+        <tr>
+            <th>
+                S/N
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                Created By
+            </th>
+            <th>
+                Date Created
+            </th>
+            <th>
+                Updated By
+            </th>
+            <th>
+                Date Updated
+            </th>
+            <th>
+                
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @{ int i = 1; }
+        @foreach (var item in Model)
+        {
+             if(item.CreatedBy == null) { item.CreatedBy = new UserDto { UserName = "Empty" }; };
+             if(item.UpdatedBy == null) { item.UpdatedBy = new UserDto { UserName = "Empty" }; };
+            if(item.DeletedBy == null) { item.DeletedBy = new UserDto { UserName = "Empty" }; };
+            <tr>
+                <td>
+                    @i
+                    @{i++;}
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @item.CreatedBy.UserName
+                </td>
+                <td>
+                    @item.DateCreated.ToShortDateString()
+                </td>
+                <td>
+                    @item.UpdatedBy.UserName
+                </td>
+
+                <td>
+                    @if (item.DateUpdated is null)
+                    {
+                        s = "N/A";
+                        @s
+                    }
+
+                    else
+                    @item.DateUpdated.Value.ToShortDateString()
+                </td>
+
+                <td>
+
+                    <a asp-action="UpdateItemType" asp-controller="ItemType" asp-route-itemTypeId="@item.Id"><i class="fa fa-edit" data-toggle="tooltip" data-placement="top" title="Edit"></i></a>
+
+                    @*@Html.ActionLink("Edit", "UpdateItemType", new { itemTypeId = item.Id /* id=item.PrimaryKey */ })*@ |
+                    @*@Html.ActionLink("Details", "Details", new {itemTypeId= item.Id /* id=item.PrimaryKey */ }) |*@
+                    @*<a href="#MyModal" id="createItemType" data-target="#myModal" class="trigger-btn" data-toggle="modal">Delete</a>*@
+                    <a href="#" onClick="Delete('@item.Id', '@url2' )"><i class="fa fa-trash" data-toggle="tooltip" data-placement="top" title="Delete"></i></a>
+
+                    @*<input type="button" onClick="Delete('@item.Id', '@url2' )" value="Delete" />*@
+
+                    @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.ActivateItem) && item.IsActive == false)
+                    {
+                        <input type="button" onClick="Activate('@item.Id', '@url3' )" value="Activate" />
+                    }
+                    @*@Html.ActionLink("Delete", "DeleteItemType", "ItemType", new { itemTypeId = item.Id /* id=item.PrimaryKey */ })*@
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    function Delete(id, url) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.value) {
+                //Swal.fire(
+                //    'Deleted!',
+                //    'Your file has been deleted.',
+                //    'success'
+                //)
+                 
+                window.location.replace(url + "?itemTypeId=" + id)
+            }
+        })
+    }
+
+    function Activate(id, url) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.value) {
+                //Swal.fire(
+                //    'Deleted!',
+                //    'Your file has been deleted.',
+                //    'success'
+                //)
+                 
+                window.location.replace(url + "?itemTypeId=" + id)
+            }
+        })
+    }
+</script>
+<!-- Modal HTML -->
+@*<div id="myModal" class="modal fade">
+        <div class="modal-dialog modal-confirm">
+            <div class="modal-content">
+                <div class="modal-header">
+                   <div class="icon-box">
+                        <i class="fas fa-times"></i>
+                    </div>
+                    <h4 class="modal-title">Delete Item Type</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>Do you really want to delete this Item Type? This process cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <form asp-action="DeleteItemType" method="get">
+                        <input type="hidden" name="id" value="" />
+                        <button type="button" class="btn btn-info" data-dismiss="modal">Cancel</button>
+                        <input type="submit" value="Delete" class="btn btn-danger" />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>*@

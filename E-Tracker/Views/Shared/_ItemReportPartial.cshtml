@@ -1,0 +1,95 @@
+﻿@model IEnumerable<ItemDto>
+@inject E_Tracker.Repository.DepartmentRepo.IDepartmentRepository DepartmentRepository
+<div class="card">
+    <!-- Card header -->
+    <div class="card-header">
+        <h3 class="mb-0">Item Report</h3>
+    </div>
+
+    <div class="card-body">
+        <!-- Light table -->
+        <div class="table-responsive py-4">
+            <table id="reportTable" class="table align-items-center table-flush" style="width:100%">
+                <thead class="thead-light">
+                    <tr>
+                        <th>S/N</th>
+                        <th>Item Name</th>
+
+                        <th>
+                            Tag Number
+                        </th>
+                        <th>
+                            ItemType
+                        </th>
+                        <th>
+                            ItemGroup
+                        </th>
+                        <th>
+                            Item Department
+                        </th>
+                        <th>
+                            Date of Expiry
+                        </th>
+                        <th>
+                            Created by
+                        </th>
+                        <th>
+                            Approved By
+                        </th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int i = 0;
+                    }
+                    @foreach (var item in Model)
+                    {
+                        i = i + 1;
+                        var itemCreatorName = item.CreatedBy?.Surname + " " + item.CreatedBy?.OtherNames;
+                        var itemApproverName = item.ApprovedBy?.Surname + " " + item.ApprovedBy?.OtherNames;
+                        <tr>
+                            <td>@(i)</td>
+                            <td class="table-user">
+                                <b>@item.Name</b>
+                            </td>
+                            <td class="table-user">
+                                <b>@item.TagNo</b>
+                            </td>
+                            <td class="table-user">
+                                <b>@item.ItemType?.Name</b>
+                            </td>
+                            <td class="table-user">
+                                <b>@item.ItemGroup?.Name</b>
+                            </td>
+                            <td class="table-user">
+                                <b>
+                                    @{var department = await DepartmentRepository.GetDepartmentByIdAsync(item.ItemGroup?.DepartmentId); }
+                                    @department?.Name
+                                </b>
+                            </td>
+                            @*<td class="table-user">
+                                    <b>@item.DateCreated.ToString("dd/MM/yyyy")</b>
+                                </td>*@
+                            <td class="table-user">
+                                <b>@item.ExpiredDate.ToString("dd/MM/yyyy")</b>
+                            </td>
+                            @*<td class="table-user">
+                                    <b>@Item.IsApproved</b>
+                                </td>*@
+                            <td class="table-user">
+                                <b>@itemCreatorName</b>
+                            </td>
+                            <td class="table-user">
+                                <b>@itemApproverName</b>
+                            </td>
+
+                        </tr>
+
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+

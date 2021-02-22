@@ -1,0 +1,401 @@
+@model ItemGroupDto
+@inject Microsoft.AspNetCore.Identity.UserManager<User> UserManager
+@{
+    ViewData["Title"] = Model.Name;
+    if (Model.CreatedBy == null) { Model.CreatedBy = new UserDto { UserName = "Empty" }; };
+    if (Model.UpdatedBy == null) { Model.UpdatedBy = new UserDto { UserName = "Empty" }; };
+    if (Model.DeletedBy == null) { Model.DeletedBy = new UserDto { UserName = "Empty" }; };
+    var url1 = $"{@Url.Action("ApproveItem", "Item", null, this.Url.ActionContext.HttpContext.Request.Scheme)}";
+    var url3 = $"{@Url.Action("ActivateItem", "Item", null, this.Url.ActionContext.HttpContext.Request.Scheme)}";
+
+    var urlItemGroup1 = $"{@Url.Action("ApproveItemGroup", "ItemGroup", null, this.Url.ActionContext.HttpContext.Request.Scheme)}";
+    var urlItemGroup3 = $"{@Url.Action("ActivateItemGroup", "ItemGroup", null, this.Url.ActionContext.HttpContext.Request.Scheme)}";
+    var s = "";
+    var url2 = $"{@Url.Action("DeleteItem", "Item", null, this.Url.ActionContext.HttpContext.Request.Scheme)}";
+    var itemCreatorName = Model.CreatedBy?.Surname + " " + Model.CreatedBy?.OtherNames;
+    var itemUpdatorName = Model.UpdatedBy?.Surname + " " + Model.UpdatedBy?.OtherNames;
+    var currentUser = await UserManager.GetUserAsync(User);
+    List<Item> items = ViewBag.Items?? new List<Item>();
+
+
+}
+
+<h1>@Model.Name details</h1>
+
+<div class="row">
+
+    <div class="col-lg-12">
+        <div class="card o-hidden border-0 shadow-lg my-5">
+            <div class="card-body p-0">
+                <!-- Nested Row within Card Body -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="p-5">
+                            <div class="text-center">
+                                @*<h1 class="h4 text-gray-900 mb-4">@Model.Name details</h1>*@
+                            </div>
+                            <div asp-validation-summary="All" class="text-danger"></div>
+                            <div class="form-group row mb-1">
+                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                    <div class="form-group">
+                                        <label asp-for="Name" class="display-6 font-weight-bold">Name</label>
+                                        <p>@Model.Name</p>
+                                    </div>
+
+                                </div>
+                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                    <div class="form-group">
+                                        <label asp-for="TagNo" class="display-6 font-weight-bold">Tag Number</label>
+                                        <p>@Model.TagNo</p>
+                                    </div>
+                                </div>
+                            </div>
+                           
+
+                            <div class="form-group row mb-1">
+                                @*<div class="col-sm-6 mb-3 mb-sm-0">
+                                    <div class="form-group">
+                                        <label asp-for="ExpiredDate" class="display-6 font-weight-bold">Date of Expiry</label>
+                                        <p>@Model.ExpiredDate.ToShortDateString()</p>
+                                    </div>
+                                </div>*@
+
+
+                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                    <div class="form-group">
+                                        <label asp-for="CategoryName" class="display-6 font-weight-bold">Item Group Category</label>
+                                        <p>@Model.CategoryName</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                    <div class="form-group">
+                                        <label asp-for="DepartmentName" class="display-6 font-weight-bold">Item Group Department</label>
+                                        <p>@Model.DepartmentName</p>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group row mb-1">
+                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                    <div class="form-group">
+                                        <label asp-for="CreatedBy" class="display-6 font-weight-bold">Created By</label>
+                                        <p>@itemCreatorName</p>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                    <div class="form-group">
+                                        <label asp-for="DateCreated" class="display-6 font-weight-bold">Created Date</label>
+                                        <p>
+                                            @Model.DateCreated.ToShortDateString()
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-1">
+                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                    <div class="form-group">
+                                        <label asp-for="UpdatedBy" class="display-6 font-weight-bold">Updated By</label>
+                                        <p>@itemUpdatorName</p>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                    <div class="form-group">
+                                        <label asp-for="DateUpdated" class="display-6 font-weight-bold">Updated Date</label>
+                                        <p>
+                                            @if (Model.DateUpdated is null)
+                                            {
+                                                s = "N/A";
+                                                @s
+                                            }
+
+                                            else
+                                            {
+                                                @Model.DateUpdated.Value.ToShortDateString()
+                                            }
+                                        </p>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                            <table class="table table-striped table-primary">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            @Html.DisplayNameFor(model => model.IsApproved)
+                                        </th>
+                                        <th>
+                                            Approved By
+                                        </th>
+                                       
+                                        <th></th>
+                                    </tr>
+
+                                </thead>
+                                <tbody>
+
+                                    <tr>
+                                        <td>
+                                            @{string status = "";}
+                                            @*@Html.DisplayFor(modelItem => item.IsApproved)*@
+                                            @{ if (Model.IsApproved == true) status = "APPROVED"; else status = "NOT APPROVED"; }
+                                            @status
+                                        </td> 
+                                        <td>
+                                            @{ string name = "N/A";}
+                                            @{if (Model.IsApproved == true)
+                                                {
+                                                    name = Model.ApprovedBy?.Surname+ " " + Model.ApprovedBy?.OtherNames;
+                                                    @name;
+                                                }
+                                                else
+                                                    @name
+                                            }
+                                        </td>
+                                        
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+                            <a asp-action="AllItemGroupsCreatedByMyDepartment" asp-controller="ItemGroup" class="btn btn-dark mt-2">All Item Groups</a>
+                            <hr>
+
+                            @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.ApproveItemGroup) && Model.IsApproved == false && Model.IsActive == true)
+                            {
+                                <input type="button" class="btn btn-primary" onClick="Approve('@Model.Id', '@urlItemGroup1' )" value="Approve" />
+                            }
+
+                           
+
+                            @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.ActivateItemGroup) && Model.IsActive == false)
+                            {
+                                <input type="button" class="btn btn-dark" onClick="Activate('@Model.Id', '@urlItemGroup3' )" value="Activate" />
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+
+    <div class="col-lg-12">
+        <div class="card o-hidden border-0 shadow-lg my-5">
+            <div class="card-body p-0">
+                <!-- Nested Row within Card Body -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="p-5">
+                            <h1>Items for the above ItemGroup(@Model?.Name)</h1>
+
+                            @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.CreateItem) && ViewBag.IsAllItems ?? true)
+                            {
+                                <p>
+                                    @*id="createItem" data-target="#myModal" class="trigger-btn" data-toggle="modal"*@
+                                    <a asp-action="CreateItem" asp-controller="Item" asp-route-itemGroupId="@Model.Id" class="btn btn-primary">Create New</a>
+                                </p>
+
+                            }
+                            <table id="myTable" class="table table-striped table-primary">
+                                <thead>
+                                    <tr>
+
+                                        <th>
+                                            Item Name
+                                        </th>
+                                        @*<th>
+                                            Item Type
+                                        </th>
+
+                                        <th>
+                                            Department
+                                        </th>*@
+                                        <th>
+                                            Date of Expiry
+                                            @*@Html.DisplayNameFor(model => model.ExpiredDate)*@
+                                        </th>
+                                        <th>
+                                            Approval Status
+                                            @*@Html.DisplayNameFor(model => model.IsApproved)*@
+                                        </th>
+                                        <th>
+                                            Tag Number
+                                            @*@Html.DisplayNameFor(model => model.TagNo)*@
+                                        </th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in items)
+                                    {
+                                        <tr>
+
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Name)
+                                            </td>
+                                            @*<td>
+                                                @Html.DisplayFor(modelItem => item.ItemType.Name)
+                                            </td>
+
+                                            <td>
+                                                @Model.DepartmentName
+                                            </td>*@
+                                            <td>
+                                                @item.ExpiredDate.ToLongDateString()
+                                                @if (item.IsApproved == true && item.IsActive == true && item.ExpiredDate <= DateTime.Now)
+                                                {
+                                                    <i class="fa fa-exclamation-triangle" data-toggle="tooltip" data-placement="top" title="Expired"></i>
+                                                }
+                                                @*@Html.DisplayFor(modelItem => item.ExpiredDate.ToShortDateString())*@
+                                            </td>
+                                            <td>
+                                                @{string status2 = "";}
+                                                @*@Html.DisplayFor(modelItem => item.IsApproved)*@
+                                                @{ if (item.IsApproved == true) status2 = "APPROVED"; else status2 = "NOT APPROVED"; }
+                                                @status2
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.TagNo)
+                                            </td>
+                                            <td>
+                                                @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.UpdateItem) && item.IsActive == true && item.IsApproved != true)
+                                                {
+                                                    <a asp-action="UpdateItem" asp-controller="Item" asp-route-itemId="@item.Id"><i class="fa fa-edit" data-toggle="tooltip" data-placement="top" title="Edit"></i></a>
+                                                    @*@Html.ActionLink("Edit", "UpdateItem", new { itemId = item.Id /* id=item.PrimaryKey */ })*@ @:|
+                                                }
+
+                                                <a asp-action="Details" asp-controller="Item" asp-route-itemId="@item.Id"><i class="fa fa-eye" data-toggle="tooltip" data-placement="top" title="Details"></i></a>
+
+                                                @* @Html.ActionLink("Details", "Details", new { itemId = item.Id /* id=item.PrimaryKey */ }) |*@
+
+                                                @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.DeleteItem) && item.IsActive == true)
+                                                {
+                                                    @:|<a href="#" onClick="Delete('@item.Id', '@url2' )"><i class="fa fa-trash" data-toggle="tooltip" data-placement="top" title="Delete"></i></a>
+                                                }
+                                                @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.DeleteItem) && item.IsActive == false)
+                                                {
+
+                                                    @:|<a href="#" onClick="Restore('@item.Id', '@url3' )"><i class="fas fa-trash-restore" data-toggle="tooltip" data-placement="top" title="Restore"></i></a>
+                                                }
+
+                                                @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.ApproveItem) && item.IsApproved == false && item.IsActive == true)
+                                                {
+                                                    @:|<a href="#" onClick="Approve('@item.Id', '@url1' )"><i class="fa fa-check-square" data-toggle="tooltip" data-placement="top" title="Approve"></i></a>
+
+
+
+
+
+
+
+
+                                                    @*<input type="button" onClick="Approve('@item.Id', '@url1' )" value="Approve" />*@
+                                                }
+
+                                                @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.UpdateService) && item.IsApproved == true && item.IsActive == true && item.ItemType.Name.Equals("servicing", StringComparison.OrdinalIgnoreCase))
+                                                {
+                                                    @:|
+                                                    <a asp-action="CreateService" asp-controller="Service" asp-route-itemId="@item.Id"><i class="fa fa-wrench" data-toggle="tooltip" data-placement="top" title="Service"></i></a>
+
+
+                                                    @*@Html.ActionLink("ServiceItem", "CreateService", "Service", new { itemId = item.Id /* id=item.PrimaryKey */ })*@
+
+                                                }
+                                                @if (User.HasClaim(CustomClaims.Permission, CustomClaimsValues.UpdateService) && item.IsApproved == true && item.IsActive == true && item.ItemType.Name.Equals("renewal", StringComparison.OrdinalIgnoreCase))
+                                                {
+                                                    @:|
+                                                    <a asp-action="CreateService" asp-controller="Service" asp-route-itemId="@item.Id"><i class="fa fa-redo" data-toggle="tooltip" data-placement="top" title="Renew"></i></a>
+
+
+                                                    @*@Html.ActionLink("ServiceItem", "CreateService", "Service", new { itemId = item.Id /* id=item.PrimaryKey */ })*@
+
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+             </div>
+        </div>
+    </div>
+</div>
+@section Scripts
+{
+ <script>
+
+function Approve(id, url) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, Approve it!'
+    }).then((result) => {
+        if (result.value) {
+            //Swal.fire(
+            //    'Deleted!',
+            //    'Your file has been deleted.',
+            //    'success'
+            //)
+
+            window.location.replace(url + "?itemGroupId=" + id)
+        }
+    })
+}
+     function Delete(id, url) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.value) {
+                //Swal.fire(
+                //    'Deleted!',
+                //    'Your file has been deleted.',
+                //    'success'
+                //)
+
+                window.location.replace(url + "?itemId=" + id)
+            }
+        })
+     }
+
+function Activate(id, url) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, Activate it!'
+    }).then((result) => {
+        if (result.value) {
+            //Swal.fire(
+            //    'Deleted!',
+            //    'Your file has been deleted.',
+            //    'success'
+            //)
+
+            window.location.replace(url + "?itemId=" + id)
+        }
+    })
+}
+ </script>
+
+}

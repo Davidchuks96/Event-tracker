@@ -1,0 +1,98 @@
+﻿@model List<Notification>
+@{
+    ViewData["Title"] = "Notifications - " + ViewBag.Username;
+}
+
+<div class="row">
+
+    <div class="col-lg-12">
+        <div class="card o-hidden border-0 shadow-lg my-5">
+            <div class="card-body p-0">
+                <!-- Nested Row within Card Body -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="p-5">
+                            <div class="text-center">
+                                <h1 class="h4 text-gray-900 mb-4">@ViewBag.Username Notifications</h1>
+                            </div>
+                            <div asp-validation-summary="All" class="text-danger"></div>
+                            @foreach (var notification in Model)
+                            {
+                       
+                                if (notification.NotificationType == NotificationType.ToApproveItem)
+                                {
+                                    <li class="list-group-item notification-text alert" role="alert" style="color:black">
+                                        <a href="#" class="close btn anchorClose" data-dismiss="alert" id="@notification.Id" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </a> 
+                                        @notification.Text <a href="~/Item/Details?itemId=@notification.ItemId" target="_blank">here</a>.
+                                        <br /><small>@notification.DateCreated.ToString("dddd, dd MMMM yyyy hh:mm tt")</small>
+                                    </li>
+                                }
+                                else if (notification.NotificationType == NotificationType.ToApproveService)
+                                {
+                                    <li class="list-group-item notification-text alert" style="color:black">
+                                        <a href="#" class="close btn anchorClose" id="@notification.Id" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </a> 
+                                        @notification.Text <a href="~/Service/Details?serviceId=@notification.ServiceId" target="_blank">here</a>.
+                                        <br /><small>@notification.DateCreated.ToString("dddd, dd MMMM yyyy hh:mm tt")</small>
+                                    </li>
+                                }
+                                //Approved Item
+                                else
+                                {
+                                    <li class="list-group-item notification-text alert" style="color:black">
+                                        <a href="#" class="close btn anchorClose" id="@notification.Id" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span> 
+                                        </a>
+                                        @notification.Text
+                                        <br /><small>@notification.DateCreated.ToString("dddd, dd MMMM yyyy hh:mm tt")</small>
+                                    </li>
+                                }
+
+                                <br />
+                            }
+
+                        </div>
+                        <a asp-action="Dashboard" asp-controller="Admin" class="btn btn-primary ml-3 mb-3">Go back</a>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+     //$("ul").on('click', 'li.notification-text', function (e) {
+     //           console.log('pelenotify:', e);
+     //           var target = e.target;
+     //           var id = $(target).data('id');
+     //           readNotification(id, target);
+     //       });
+
+            //$("a.close.btn").on('click', function (e) {
+            //    //debugger
+            //    var target = e.target;
+            //    var id = $(target).data('id');
+            //    readNotification(id, target);
+            //})
+
+            //function readNotification(id, target) {
+            //    $.ajax({
+            //        url: "/Notification/ReadNotificationAjax",
+            //        method: "GET",
+            //        data: { notificationId: id },
+            //        success: function (result) {
+            //            //debugger
+            //            //getNotification();
+            //            //$(target).fadeOut('slow');
+            //        },
+            //        error: function (error) {
+            //            console.log(error);
+            //        }
+            //    })
+            //}
+</script>

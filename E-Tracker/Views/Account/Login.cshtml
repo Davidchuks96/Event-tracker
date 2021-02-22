@@ -1,0 +1,112 @@
+﻿@model E_Tracker.Dto.LoginDto
+
+@{
+    Layout = "";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>E-Tracker Login</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="~/admin/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="~/admin/css/sb-admin-2.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+</head>
+
+<body class="bg-gradient-primary">
+
+    <div class="container">
+
+        <!-- Outer Row -->
+        <div class="row justify-content-center">
+
+            <div class="col-xl-10 col-lg-12 col-md-9">
+
+                <div class="card o-hidden border-0 shadow-lg my-5">
+                    <div class="card-body p-0">
+                        <!-- Nested Row within Card Body -->
+                        <div class="row">
+                            <div class="col-lg-6 d-none d-lg-block">
+                                <img src="~/admin/img/Logo.jpg"c style="height:100%; width:100%" />
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="p-5">
+                                    <div class="text-center">
+                                        <h1 class="h4 text-gray-900 mb-4">Login</h1>
+                                    </div>
+                                    <form class="user" asp-controller="Account" asp-action="Login" method="post">
+                                        <div asp-validation-summary="All" class="text-danger"></div>
+                                        @if (TempData["Message"] != null)
+                                        {
+                                            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                                                <i class="fas fa-check"></i>
+                                                @TempData["Message"]
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                        }
+                                        @if (ViewBag.IsEmailNotConfirmned != null)
+                                        {
+                                            <div class="text-danger validation-summary-errors" data-valmsg-summary="true">
+                                                <ul>
+                                                    @*<li>*@
+                                                    <a class="text-info ml-2" asp-action="ResendConfirmationEmail" asp-controller="Account" asp-route-email="@Model?.Email">
+                                                        Or request a new email.
+                                                    </a>
+                                                    @*</li>*@
+
+                                                </ul>
+                                            </div>
+                                        }
+                                        <div class="form-group">
+                                            <input type="email" asp-for="@Model.Email" class="form-control form-control-user" id="exampleInputEmail" aria-describedby="emailHelp" placeholder="Enter Email Address...">
+                                            <span asp-validation-for="Email" class="text-danger"></span>
+                                        </div>
+                                        <input type="text" asp-for="@Model.ReturnUrl" hidden class="form-control form-control-user" id="returnUrl">
+                                        <div class="form-group">
+                                            <input type="password" asp-for="@Model.Password" class="form-control form-control-user" id="exampleInputPassword" placeholder="Password">
+                                            <span asp-validation-for="Password" class="text-danger"></span>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary btn-user btn-block">
+                                            Login
+                                        </button>
+                                    </form>
+                                   
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="~/admin/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="~/admin/js/sb-admin-2.min.js"></script>
+
+</body>
+
+</html>

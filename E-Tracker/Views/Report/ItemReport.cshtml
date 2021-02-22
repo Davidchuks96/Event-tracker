@@ -1,0 +1,107 @@
+﻿@model IEnumerable<ItemDto>
+    <!-- Argon CSS -->
+<link rel="stylesheet" href="~/assets/css/argon.mine209.css?v=1.0.0" type="text/css">
+<!-- Icons -->
+<link rel="stylesheet" href="~/assets/vendor/nucleo/css/nucleo.css" type="text/css">
+@{
+    var message = /*ViewBag?.SearchParameters?.CategoryName ?? "" +*/(ViewBag?.SearchParameters?.ItemTypeName ?? "") + " " + (ViewBag?.SearchParameters?.CategoryName ?? "");
+    message = message == "" ? "All" : message;
+    var department = ViewBag?.SearchParameters?.ItemDepartmentName ?? "All Departments";
+
+}
+<form method="post">
+    <div class="card mb-4">
+        <!-- Card header -->
+        <div class="card-header">
+            <h3 class="mb-0">Search Parameter</h3>
+        </div>
+        <!-- Card body -->
+        <div class="card-body">
+            <!-- Form groups used in grid -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="form-group row">
+                        <label class="col-md-2 col-form-label form-control-label">Item Category:</label>
+                        <div class="col-md-4">
+                            <select name="categoryId" asp-items="@ViewBag.Categories"
+                                    class="form-control custom-select" required>
+                                <option value="">Please select category</option>
+                            </select>
+                        </div>
+                        <label class="col-md-2 col-form-label form-control-label">Item Type: </label>
+                        <div class="col-md-4">
+                            <select name="itemTypeId" asp-items="@ViewBag.ItemTypes"
+                                    class="form-control custom-select" required>
+                                <option value="">Please select item type</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="input-daterange datepicker row align-items-center">
+                        <label class="col-md-2 col-form-label form-control-label">Date Range:</label>
+                        <div class="input-group col-md-2">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="ni ni-calendar-grid-58"></i></span>
+                            </div>
+                            <input class="form-control datepicker" placeholder="Start date" name="startDate" type="text" value="@ViewBag?.SearchParameters?.StartDate" required>
+                        </div>
+                        <label class="col-form-label form-control-label">To:</label>
+                        <div class="input-group col-md-2">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="ni ni-calendar-grid-58"></i></span>
+                            </div>
+                            <input class="form-control datepicker" placeholder="End date" name="endDate" type="text" value="@ViewBag?.SearchParameters?.EndDate" required>
+                        </div>
+                        <label class="col-md-2 col-form-label form-control-label">Item Department: </label>
+                        <div class="col-md-3">
+                            <select name="itemDepartmentId" asp-items="@ViewBag.Departments"
+                                    class="form-control custom-select" required>
+                                <option value="">Please select item department</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="input-group col-2 offset-10 mt-2">
+                            <input class="btn btn-primary form-control" type="submit" value="Generate" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@await Html.PartialAsync("_ItemReportPartial", Model)
+
+@section Scripts
+    {
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('#reportTable').DataTable(
+                {
+                    dom: "Bfrtip",
+                    buttons: [
+                        'copy',
+                         {
+                            extend: 'excel',
+                             title: 'Report of @message Items in @department to expire between  @ViewBag?.SearchParameters?.StartDate and @ViewBag?.SearchParameters?.EndDate '
+                         },
+                         {
+                            extend: 'print',
+                             title: 'Report of @message Items in @department to expire between  @ViewBag?.SearchParameters?.StartDate and @ViewBag?.SearchParameters?.EndDate '
+                         },
+                         {
+                            extend: 'pdf',
+                             title: 'Report of @message Items in @department to expire between  @ViewBag?.SearchParameters?.StartDate and @ViewBag?.SearchParameters?.EndDate '
+                         }
+                    ]
+                }
+            );
+
+            $('.buttons-copy, .buttons-excel, .buttons-print, .buttons-pdf').removeClass('btn btn-secondary').addClass('btn-primary mb-2 mr-2');
+        });
+
+    </script>
+}
